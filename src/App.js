@@ -1,24 +1,52 @@
-import logo from './logo.svg';
-import './App.css';
+/* import { initializeApp } from 'firebase/app';
+import {
+  getAuth,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+} from 'firebase/auth';
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  limit,
+  onSnapshot,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  serverTimestamp,
+} from 'firebase/firestore';
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from 'firebase/storage';
+import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { getPerformance } from 'firebase/performance'; */
+
+import React, { useState, useEffect, } from "react";
+import { BrowserRouter, Routes, Route, HashRouter, Link } from "react-router-dom";
+import Login from "./components/login";
+import Home from "./components/home";
+import ViewTweet from "./components/viewtweet";
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <HashRouter>
+      <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/home" element={<Home />} />
+      <Route path="/viewtweet" element={<ViewTweet />} />
+      </Routes>
+    </HashRouter>
   );
 }
 

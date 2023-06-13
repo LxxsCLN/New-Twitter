@@ -1,13 +1,97 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@font-face {
+  font-family: 'ChirpRegular';
+  src:  url('/src/fonts/chirpregular.woff') format('woff');  
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@font-face {
+  font-family: 'ChirpBold';
+  src:  url('/src/fonts/chirpbold.woff') format('woff')
+}
+
+/* @font-face {
+  font-family: 'ChirpHeavy';
+  src:  url('/src/fonts/chirp-heavy-web.woff') format('woff')
+}
+
+@font-face {
+  font-family: 'ChirpMedium';
+  src:  url('/src/fonts/chirp-medium-web.woff') format('woff')
+}  */
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'ChirpRegular';
+}
+
+
+.loginlogo{  
+  height: 100px;
+  width: 100px;  
+}
+
+p{
+  font-size: 14px;
+  line-height: 19px;
+}
+
+h1{
+  text-align: center;
+  font-family: 'ChirpBold';
+}
+
+#root{
+  padding: 15px;
+}
+
+.login{
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+.nav{
+  border: 1px solid black;
+}
+
+.tweet{
+  border: 1px solid blue;
+}
+
+
+
+
+#customBtn {
+  display: inline-block;
+  background: white;
+  color: #444;
+  width: 190px;
+  border-radius: 5px;
+  border: thin solid #888;
+  box-shadow: 1px 1px 1px grey;
+  white-space: nowrap;
+}
+#customBtn:hover {
+  cursor: pointer;
+}
+
+span.icon {
+  background: url('https://developers-dot-devsite-v2-prod.appspot.com/identity/sign-in/g-normal.png') transparent 5px 50% no-repeat;
+  display: inline-block;
+  vertical-align: middle;
+  width: 42px;
+  height: 42px;
+}
+
+span.buttonText {
+  display: inline-block;
+  vertical-align: middle;
+  padding-left: 42px;
+  padding-right: 42px;
+  font-size: 14px;
+  font-weight: bold;
+  /* Use the Roboto font that is loaded in the <head> */
+  font-family: 'Roboto', sans-serif;
 }
