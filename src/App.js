@@ -1,4 +1,4 @@
-/* import { initializeApp } from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import {
   getAuth,
   onAuthStateChanged,
@@ -29,16 +29,21 @@ import {
   getDownloadURL,
 } from 'firebase/storage';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
-import { getPerformance } from 'firebase/performance'; */
+import { getPerformance } from 'firebase/performance'; 
 
 import React, { useState, useEffect, } from "react";
 import { BrowserRouter, Routes, Route, HashRouter, Link } from "react-router-dom";
 import Login from "./components/login";
 import Home from "./components/home";
 import ViewTweet from "./components/viewtweet";
+import Tweet from "./components/tweet";
+import uniqid from 'uniqid';
 
 
 function App() {
+  
+  
+
   return (
     <HashRouter>
       <Routes>

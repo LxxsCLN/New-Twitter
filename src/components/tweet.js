@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 
-function Tweet() {
+function Tweet(props) {
 
   const firebaseConfig = {
     apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
@@ -29,15 +29,12 @@ function Tweet() {
         navigate("/viewtweet", true)
       }} className="tweet">
 
-        <img alt="" src=""></img>
-        <h4>Name</h4>
-        <p> Kylian Mbappé has informed PSG of his decision: he’ll NOT trigger the option to extend current contract until 2025, it means that deal would expire next June 2024 — as L’Équipé called.
-
-PSG position: NO plan to lose Kylian for free.
-
-Sign new deal now or he could be sold.</p>
-        <button>Like</button>
-        <p>Fecha</p>
+        <img alt="" src={props.tweet.profilePicUrl || ""}></img>
+        <h4>{props.tweet.name}</h4>
+        <p>{props.tweet.tweet}</p>
+        <button>Likes: {props.tweet.likes}</button>
+        <p>Comments: {props.tweet.comments}</p>
+        <p>Date: {props.tweet.timestamp.toMillis()}</p>
 
       </div>
     );
