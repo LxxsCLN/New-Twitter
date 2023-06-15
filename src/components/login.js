@@ -18,13 +18,14 @@ function Login() {
   const provider = new GoogleAuthProvider();  
   const auth = getAuth();
   const navigate = useNavigate();
+
   
   onAuthStateChanged(getAuth(), authStateObserver);
 
   function authStateObserver(user){
+    
     if (user){
-      navigate("/home")
-      console.log("user!")
+      navigate("/home", true)
     }
   }  
     

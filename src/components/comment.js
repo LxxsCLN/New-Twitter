@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 
-function Comment() {
+function Comment(props) {
 
   const firebaseConfig = {
     apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
@@ -22,18 +22,15 @@ function Comment() {
   const auth = getAuth();
   const navigate = useNavigate();
   
-  // const [user, loading] = useAuthState(auth);
 
     return (
-      <div onClick={()=>{
-        navigate("/viewtweet", true)
-      }} className="comment">
+      <div className="comment">
 
-        <img alt="" src=""></img>
-        <h4>Name</h4>
-        <p>No cambies la meta, cambia el plan</p>
-        <button>Like</button>
-        <p>Fecha</p>
+        <img alt="" src={props.tweet.profilePicUrl || ""}></img>
+        <h4>{props.tweet.name}</h4>
+        <p>{props.tweet.tweet}</p>
+        <button>Likes: {props.tweet.likes}</button>
+        <p>Date: {111111}</p>
 
       </div>
     );

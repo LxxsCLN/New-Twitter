@@ -17,6 +17,7 @@ function Tweet(props) {
     appId: "1:845912882937:web:d1d5fe3a1fe71bc14c6c28"
   };
 
+
   const app = initializeApp(firebaseConfig);  
   const provider = new GoogleAuthProvider();  
   const auth = getAuth();
@@ -27,12 +28,17 @@ function Tweet(props) {
     return (
       <div onClick={()=>{
         navigate("/viewtweet", true)
+        props.setsingletweet(props.id)
       }} className="tweet">
 
         <img alt="" src={props.tweet.profilePicUrl || ""}></img>
         <h4>{props.tweet.name}</h4>
         <p>{props.tweet.tweet}</p>
-        <button>Likes: {props.tweet.likes}</button>
+        <button onClick={async (e)=>{
+          e.preventDefault()
+          e.stopPropagation()
+          await props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)
+        }} >Likes: {props.tweet.likes}</button>
         <p>Comments: {props.tweet.comments}</p>
         <p>Date: {props.tweet.timestamp.toMillis()}</p>
 

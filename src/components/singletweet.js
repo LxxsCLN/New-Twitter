@@ -4,8 +4,26 @@ import React from "react"
 import { useNavigate, } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
+import uniqid from 'uniqid';
 
-function SingleTweet() {
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  limit,
+  onSnapshot,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  serverTimestamp,
+} from 'firebase/firestore';
+
+function SingleTweet(props) {
 
   const firebaseConfig = {
     apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
@@ -21,18 +39,47 @@ function SingleTweet() {
   const auth = getAuth();
   const navigate = useNavigate();
 
+  const db = getFirestore();
+
+  const [tweet, setTweet] = useState("");
+
+  const handleChange = (event) => {
+    setTweet(event.target.value);
+  };
+  
+  async function addComment(){
+    try {
+      await addDoc(collection(getFirestore(), "Tweets", props.id, "Comments"), {
+        author: getAuth().currentUser.uid,
+        tweet: tweet,
+        name: getAuth().currentUser.displayName,
+        profilePicUrl: getAuth().currentUser.photoURL || null,
+        timestamp: serverTimestamp(),
+        likes: 0,
+        userlikes: []
+      });
+    }
+    catch(error) {
+      console.error('Error writing new message to Firebase Database', error);
+    }
+  }
+
+  
   return (
     <div className="SingleTweet">
 
-        <img alt="" src=""></img>
-        <h4>Name</h4>
-        <p>No cambies la meta, cambia el plan</p>
-        <button>Like</button>
-        <p>Fecha</p>
+             
+        <img alt="" src={props.tweet.profilePicUrl || ""}></img>
+        <h4>{props.tweet.name}</h4>
+        <p>{props.tweet.tweet}</p>
+        <button>Likes: {props.tweet.likes}</button>
+        <p>Comments: {props.tweet.comments}</p>
+        <p>Date: {props.tweet.timestamp.toMillis()}</p>
         <form>
-          <input className="commentinput" placeholder="Escribe tu comentario..."></input>
-          <button>Comentar</button>
+          <input onChange={handleChange} className="commentinput" placeholder="Escribe tu comentario..."></input>
+          <button onClick={addComment} >Comentar</button>
         </form>
+
 
     </div>
   );

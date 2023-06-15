@@ -42,14 +42,18 @@ import uniqid from 'uniqid';
 
 function App() {
   
-  
+  const [thisTweet, setThisTweet] = useState()
+
+function setsingletweet(docid){
+  setThisTweet(docid)
+}
 
   return (
     <HashRouter>
       <Routes>
       <Route path="/" element={<Login />} />
-      <Route path="/home" element={<Home />} />
-      <Route path="/viewtweet" element={<ViewTweet />} />
+      <Route path="/home" element={<Home setsingletweet={setsingletweet} />} />
+      <Route path="/viewtweet" element={<ViewTweet thisTweet={thisTweet} />} />
       </Routes>
     </HashRouter>
   );

@@ -48,8 +48,31 @@ function Home(props) {
   const provider = new GoogleAuthProvider();  
   const auth = getAuth();
   const db = getFirestore();
+
+
   
   const [tweet, setTweet] = useState("");
+
+  async function likeTweet(id, likes, usrlikes){
+    const doesLike = usrlikes.includes(getAuth().currentUser.uid)
+    const newuserlikes = [...usrlikes] 
+    const currTWT = doc(db, "Tweets", id);
+    let newlikes = likes;
+
+    if (!doesLike){
+      newlikes += 1;
+      newuserlikes.push(getAuth().currentUser.uid)
+    } else {
+      let index = usrlikes.indexOf(getAuth().currentUser.uid)
+      newuserlikes.splice(index, 1); 
+      newlikes -= 1;
+    }
+    
+    await updateDoc(currTWT, {
+    likes: newlikes,
+    userlikes: newuserlikes,
+    });
+  }
 
   const handleChange = (event) => {
     setTweet(event.target.value);
@@ -64,7 +87,8 @@ function Home(props) {
         profilePicUrl: getAuth().currentUser.photoURL || null,
         timestamp: serverTimestamp(),
         likes: 0,
-        comments: 0
+        comments: 0,
+        userlikes: [],
       });
     }
     catch(error) {
@@ -77,10 +101,10 @@ function Home(props) {
 useEffect(()=>{
   const loadTweets = async () => {
     let twarr = []
-    const querySnapshot = await getDocs(collection(getFirestore(), "Tweets"));
+    const querySnapshot = await getDocs(collection(getFirestore(), "Tweets"), orderBy('timestamp', 'desc'), limit(20));
     querySnapshot.forEach((doc) => {
       const data = doc.data()
-      twarr.push(<Tweet key={uniqid()} tweet={data} />)
+      twarr.push(<Tweet key={uniqid()} tweet={data} id={doc.id} setsingletweet={props.setsingletweet} likeTweet={likeTweet} />)
     });
     setTweetsArray(twarr)
   }
@@ -88,12 +112,6 @@ useEffect(()=>{
 },[])
 
 
-  
-
-
-
-
-console.log()
   return (
     
     <div className="Home">
