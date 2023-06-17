@@ -2,7 +2,7 @@ import { GoogleAuthProvider, getAuth, signInWithRedirect, getRedirectResult, sig
 import { initializeApp } from "firebase/app";
 import React from "react"
 import { useNavigate, } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 function Nav(props) {
@@ -20,18 +20,31 @@ function Nav(props) {
   
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
+
+  const empty = useRef("")
+
+  function handleClick(){
+    empty.current.value = ""
+  }
   
 
     return (
       <div className="nav">
-        <h1>Logo</h1>
-        <h1>New Twitter</h1>
-        <p>{user ? user.displayName : ""}</p>
-        <img src={user ? user.photoURL : ""} alt=""></img> 
-        <button onClick={()=>{
+        <img src={user ? user.photoURL : ""} alt="" className="userlogo"></img> 
+        <img alt="" src={process.env.PUBLIC_URL + "logo.png"} className="homelogo"></img>
+        
+        <button className="logoutbutton" onClick={()=>{
           signOut(getAuth());
           navigate("/")
-        }}>Logout</button>       
+        }}>Log out</button>  
+        <form className="writetweet">
+        <input className="tweetinput" placeholder="What is happening?!" onChange={props.handleChange} ref={empty}></input>
+        <button className="submittweet" onClick={(e) => {
+          e.preventDefault()
+          props.submitTweet()
+          handleClick()
+        } }>Tweet</button>
+      </form>    
       </div>
     );
   }

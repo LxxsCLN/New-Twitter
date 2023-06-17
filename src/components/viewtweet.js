@@ -47,33 +47,26 @@ function ViewTweet(props) {
   };
 
 
+  
+
   useEffect(()=>{
     
     const loadTweets = async () => {
-      const querySnapshot = await getDocs(collection(getFirestore(), "Tweets"), orderBy('timestamp', 'desc'), limit(20));
-      
-      let thistwt = "";
-      
+      const querySnapshot = await getDocs(collection(getFirestore(), "Tweets"), orderBy('timestamp', 'desc'), limit(20));      
+      let thistwt = "";      
       querySnapshot.forEach( async(doc) => {
         const data = doc.data()
         if (doc.id === props.thisTweet){
           thistwt = <SingleTweet key={uniqid()} tweet={data} id={doc.id} handleChange={handleChange} />
           loadComments(doc.id)
-
         }
-      });
-
-
-
-      
-      setTweet(thistwt)
-      
+      });      
+      setTweet(thistwt)      
     }
 
     const loadComments = async (docid) => {
       let comments1 = []
       const queryComments = await getDocs(collection(getFirestore(), "Tweets", docid, "Comments"), orderBy('timestamp', 'desc'), limit(10));
-
       queryComments.forEach((doc2) => {
        const data2 = doc2.data()
        comments1.push(<Comment tweet={data2} key={uniqid()} />)
@@ -81,9 +74,7 @@ function ViewTweet(props) {
      setComms(comments1)
     }
 
-    loadTweets()
-    
-    
+    loadTweets() 
   }, [])
 
    

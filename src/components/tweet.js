@@ -5,6 +5,23 @@ import { useNavigate, } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  limit,
+  onSnapshot,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  serverTimestamp,
+} from 'firebase/firestore';
+
 
 function Tweet(props) {
 
@@ -18,10 +35,32 @@ function Tweet(props) {
   };
 
 
+  const [thistwt, setThisTwt] = useState()
+
+  useEffect(()=>{
+
+    const loadtwt = async() => {
+      const docRef = doc(getFirestore(), "Tweets", props.id);
+      const docSnap = await getDoc(docRef);
+      const tweet = docSnap.data();
+      const likes = tweet.likes
+      setThisTwt(tweet)
+    }
+
+    loadtwt()
+    
+  }, [])
+
+
+
+  
+
+  
   const app = initializeApp(firebaseConfig);  
   const provider = new GoogleAuthProvider();  
   const auth = getAuth();
   const navigate = useNavigate();
+  const db = getFirestore();
   
   // const [user, loading] = useAuthState(auth);
 
@@ -34,11 +73,11 @@ function Tweet(props) {
         <img alt="" src={props.tweet.profilePicUrl || ""}></img>
         <h4>{props.tweet.name}</h4>
         <p>{props.tweet.tweet}</p>
-        <button onClick={async (e)=>{
-          e.preventDefault()
+        <button onClick={(e)=>{
           e.stopPropagation()
-          await props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)
-        }} >Likes: {props.tweet.likes}</button>
+          props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)
+          
+        }} >Likes: {thistwt ? thistwt.likes : props.tweet.likes}</button>
         <p>Comments: {props.tweet.comments}</p>
         <p>Date: {props.tweet.timestamp.toMillis()}</p>
 

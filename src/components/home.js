@@ -2,7 +2,7 @@ import { GoogleAuthProvider, getAuth, signInWithRedirect, getRedirectResult, sig
 import { initializeApp } from "firebase/app";
 import React from "react"
 import { useNavigate, } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Nav from "./nav";
 import Tweet from "./tweet";
 import uniqid from 'uniqid';
@@ -49,40 +49,41 @@ function Home(props) {
   const auth = getAuth();
   const db = getFirestore();
 
-
+  let tweetinput = useRef("");
   
-  const [tweet, setTweet] = useState("");
-
+  const [isLiked, setIsLiked] = useState(false)
+ 
   async function likeTweet(id, likes, usrlikes){
+
     const doesLike = usrlikes.includes(getAuth().currentUser.uid)
     const newuserlikes = [...usrlikes] 
-    const currTWT = doc(db, "Tweets", id);
+    const currTWT = doc(getFirestore(), "Tweets", id);
     let newlikes = likes;
 
     if (!doesLike){
       newlikes += 1;
-      newuserlikes.push(getAuth().currentUser.uid)
+      newuserlikes.push(getAuth().currentUser.uid)  
     } else {
       let index = usrlikes.indexOf(getAuth().currentUser.uid)
       newuserlikes.splice(index, 1); 
-      newlikes -= 1;
+      newlikes -= 1; 
     }
-    
     await updateDoc(currTWT, {
-    likes: newlikes,
-    userlikes: newuserlikes,
-    });
+      likes: newlikes,
+      userlikes: newuserlikes,
+      });
+      setIsLiked(!isLiked)
   }
 
   const handleChange = (event) => {
-    setTweet(event.target.value);
+    tweetinput.current = event.target.value;
   };
 
   async function submitTweet(){
     try {
       await addDoc(collection(getFirestore(), "Tweets"), {
         author: getAuth().currentUser.uid,
-        tweet: tweet,
+        tweet: tweetinput.current,
         name: getAuth().currentUser.displayName,
         profilePicUrl: getAuth().currentUser.photoURL || null,
         timestamp: serverTimestamp(),
@@ -94,34 +95,33 @@ function Home(props) {
     catch(error) {
       console.error('Error writing new message to Firebase Database', error);
     }
+    tweetinput.current = ""
+    setIsLiked(!isLiked)
   } 
 
   const [tweetsarray, setTweetsArray] = useState([]);
 
+
 useEffect(()=>{
   const loadTweets = async () => {
     let twarr = []
-    const querySnapshot = await getDocs(collection(getFirestore(), "Tweets"), orderBy('timestamp', 'desc'), limit(20));
-    querySnapshot.forEach((doc) => {
-      const data = doc.data()
+    const tweetQuery = await getDocs(query(collection(getFirestore(), "Tweets"), orderBy("timestamp", "desc"), limit(20)))
+    tweetQuery.forEach((doc) => {
+      const data = doc.data()      
       twarr.push(<Tweet key={uniqid()} tweet={data} id={doc.id} setsingletweet={props.setsingletweet} likeTweet={likeTweet} />)
     });
     setTweetsArray(twarr)
   }
   loadTweets()
-},[])
+}, [isLiked])
 
 
   return (
     
     <div className="Home">
-      <Nav />
+      <Nav submitTweet={submitTweet} handleChange={handleChange} />
       {tweetsarray}
-      <form className="writetweet">
-        <input className="tweetinput" placeholder="What is happening?!" onChange={handleChange}></input>
-        <button className="submittweet" onClick={submitTweet}>Tweet</button>
-      </form>
-    </div>
+      </div>
   );
 }
 

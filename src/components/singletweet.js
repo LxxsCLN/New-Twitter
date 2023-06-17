@@ -48,6 +48,9 @@ function SingleTweet(props) {
   };
   
   async function addComment(){
+    const docRef = doc(getFirestore(), "Tweets", props.id);
+      const docSnap = await getDoc(docRef);
+      const tweet2 = docSnap.data();
     try {
       await addDoc(collection(getFirestore(), "Tweets", props.id, "Comments"), {
         author: getAuth().currentUser.uid,
@@ -62,6 +65,9 @@ function SingleTweet(props) {
     catch(error) {
       console.error('Error writing new message to Firebase Database', error);
     }
+    await updateDoc(docRef, {
+      comments: tweet2.comments + 1
+      });
   }
 
   

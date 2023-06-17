@@ -31,6 +31,17 @@
   width: 100px;  
 }
 
+.homelogo{
+  height: 25px;
+  width: 25px;
+}
+
+.userlogo{
+  height: 32px;
+  width: 32px;
+  border-radius: 100%;
+}
+
 p{
   font-size: 14px;
   line-height: 19px;
@@ -43,6 +54,7 @@ h1{
 
 #root{
   padding: 15px;
+  padding-bottom: 100px;
 }
 
 .login{
