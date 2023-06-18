@@ -4,6 +4,23 @@ import React from "react"
 import { useNavigate, } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  limit,
+  onSnapshot,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  serverTimestamp,
+} from 'firebase/firestore';
+
 function Login() {
   const firebaseConfig = {
     apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
@@ -18,13 +35,36 @@ function Login() {
   const provider = new GoogleAuthProvider();  
   const auth = getAuth();
   const navigate = useNavigate();
+  const db = getFirestore();
 
   
-  onAuthStateChanged(getAuth(), authStateObserver);
+  onAuthStateChanged(auth, authStateObserver);
+
+  async function addUser(){
+    navigate("/home", true)
+
+    const docRef = doc(db, "Users", auth.currentUser.uid);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      console.log("already user");
+
+    } else {
+      console.log("create user");
+      setDoc(doc(db, "Users", auth.currentUser.uid), {
+        userid: auth.currentUser.uid,
+        name: auth.currentUser.displayName,
+        profilePicUrl: auth.currentUser.photoURL || null,
+        timestamp: serverTimestamp(),
+        isverified: false,
+      });
+    }
+  } 
 
   function authStateObserver(user){
     
     if (user){
+      addUser()
       navigate("/home", true)
     }
   }  

@@ -84,7 +84,7 @@ function SingleTweet(props) {
       tweetinput.current = ""
       props.setIsLiked(!props.isLiked)
   }
-
+  const [user, loading] = useAuthState(auth);
   const currentUser = getAuth().currentUser.uid;
   const doesLike = props.tweet.userlikes.includes(getAuth().currentUser.uid)
   const likeClass = doesLike ? "likedtweetbutton" : "notlikedtweetbutton";
@@ -110,11 +110,11 @@ function SingleTweet(props) {
 
         <div className="toptweetdiv">
         <p className="singletweetname">{props.tweet.name}</p>
-        {currentUser === props.tweet.author ? <button onClick={(e)=>{
+        {currentUser === props.tweet.author ? <div onClick={(e)=>{
         e.preventDefault()
         props.deleteTweet(props.id)
         navigate("/home", true)
-        }} >Delete</button> : null}
+        }} ><img className="smalllogos" alt="" src={process.env.PUBLIC_URL + "delete.svg"}></img></div> : null}
         
         </div>
         <p className="timedif">@{props.tweet.name}</p>
@@ -122,25 +122,46 @@ function SingleTweet(props) {
         <p className="finaldate spantwocolumn">{finaldate}</p>
         
           <div className="bottweetdiv bottweetdiv2 spantwocolumn">
-        <p>Comments: {props.tweet.comments}</p>
-          <button className={retweetClass} onClick={(e)=>{
+          <div className="smalllogosdiv"> <img alt="" className="smalllogos2" src={process.env.PUBLIC_URL + "comment.svg"}></img><p className="font14">{props.tweet.comments}</p></div>
+
+
+        {doesRetweet ? 
+          <div className="smalllogosdiv" onClick={(e)=>{
             e.stopPropagation()
             props.retweet(props.id, props.tweet.retweets, props.tweet.userretweets)          
-            }}>Retweets: {props.tweet.retweets}</button>
-          <button className={likeClass} onClick={(e)=>{
+            }}>
+          <img alt="" className="smalllogos2" src={process.env.PUBLIC_URL + "retweeted.svg"}></img><p className="font14">{props.tweet.retweets}</p>
+          </div> :          
+          <div className="smalllogosdiv" onClick={(e)=>{
             e.stopPropagation()
-            props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)            
-          }} >Likes: {props.tweet.likes}</button>    
+            props.retweet(props.id, props.tweet.retweets, props.tweet.userretweets)          
+            }}><img alt="" className="smalllogos2" src={process.env.PUBLIC_URL + "notretweeted.svg"}></img><p className="font14">
+            {props.tweet.retweets}</p>
+          </div>
+        }
+
+         
+
+{doesLike ?<div className="smalllogosdiv" onClick={(e)=>{
+          e.stopPropagation()
+          props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)          
+          }}><img alt="" className="smalllogos2" src={process.env.PUBLIC_URL + "liked.svg"}></img><p className="font14">{props.tweet.likes}</p>
+        </div> : <div className="smalllogosdiv" onClick={(e)=>{
+          e.stopPropagation()
+          props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)          
+          }}><img alt="" className="smalllogos2" src={process.env.PUBLIC_URL + "notliked.svg"}></img><p className="font14">{props.tweet.likes}</p>
+        </div>} 
           
           </div>
         </div>
 
-        <form>
-          <input ref={empty} onChange={handleChange} className="commentinput" placeholder="Escribe tu comentario..."></input>
-          <button onClick={(e)=>{
+        <form className="replyform">
+        <img className=" tweetuserimg tweetuserimgsingle " alt="" src={user.photoURL}></img>
+          <input ref={empty} onChange={handleChange} className="commentinput" placeholder="Tweet your reply!"></input>
+          <button className="replybutton" onClick={(e)=>{
             handleClick(e)
             addComment(e)
-          } } >Comentar</button>
+          } } >Reply</button>
         </form>
 
 

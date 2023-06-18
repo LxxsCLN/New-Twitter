@@ -24,15 +24,6 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 
-import {
-  getStorage,
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-} from 'firebase/storage';
-
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
-
 
 function Home(props) {
   const firebaseConfig = {

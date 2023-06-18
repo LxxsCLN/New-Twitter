@@ -32,7 +32,7 @@ function Nav(props) {
       <div className="nav">
           {props.back ? <div onClick={()=>{
             navigate("/home", true)
-          }} className="backsvgdiv"><img  className="backsvg" alt="" src={process.env.PUBLIC_URL + "back.svg"}></img></div>  : <img referrerPolicy="no-referrer" src={user ? user.photoURL : process.env.PUBLIC_URL + "profilepic.png"} alt="" className="userlogo"></img>}
+          }} className="backsvgdiv"><img  className="backsvg" alt="" src={process.env.PUBLIC_URL + "back.svg"}></img></div>  : <img referrerPolicy="no-referrer" src={user ? user.photoURL : process.env.PUBLIC_URL + "white.png"} alt="" className="userlogo"></img>}
         
         <img onClick={()=>{
             navigate("/home", true)
