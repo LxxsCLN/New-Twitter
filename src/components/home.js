@@ -120,9 +120,9 @@ useEffect(()=>{
       <Nav />
       {tweetsarray}
 
-      <button onClick={()=>{
+      <div onClick={()=>{
         navigate("/addtweet", true)
-      } } className="addtweetbutton">Write Tweet</button>
+      } } className="addtweetbutton"><img alt="" src={process.env.PUBLIC_URL + "addtweet.svg"}></img></div>
 
       </div>
   );

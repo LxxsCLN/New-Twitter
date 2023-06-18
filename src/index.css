@@ -77,12 +77,38 @@ h1{
   position: sticky;
   top: 0px;
   background-color: white;
-  padding: 15px 10px;
+  padding: 15px 12px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   height: 52px;
+}
+
+.scale-up-center>img {
+	-webkit-animation: scale-up-center 0.3s cubic-bezier(0.165, 0.840, 0.440, 1.000) both;
+	        animation: scale-up-center 0.3s cubic-bezier(0.165, 0.840, 0.440, 1.000) both;
+}
+
+@-webkit-keyframes scale-up-center {
+  0% {
+    -webkit-transform: scale(0.5);
+            transform: scale(0.5);
+  }
+  100% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+  }
+}
+@keyframes scale-up-center {
+  0% {
+    -webkit-transform: scale(0.5);
+            transform: scale(0.5);
+  }
+  100% {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+  }
 }
 
 
@@ -149,7 +175,7 @@ h1{
   display: flex;
   flex-direction: row;
   gap: 10px;
-  padding: 8px 10px;
+  padding: 8px 12px;
   align-items: center;
   border-bottom: 1px solid rgb(239, 243, 244);
 }
@@ -163,6 +189,10 @@ h1{
 
 .lowopacity{
   opacity: .4;
+}
+
+.width28{
+  min-width: 24px;
 }
 
 .replybutton{
@@ -275,6 +305,25 @@ h1{
   color: rgb(83, 100, 113);
 }
 
+
+.addtweetbutton{
+  background-color: black;
+  width: 56px;
+  height: 56px;
+  border-radius: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  box-shadow: rgba(101, 119, 134, 0.2) 0px 0px 8px, rgba(101, 119, 134, 0.25) 0px 1px 3px 1px;;
+}
+
+.addtweetbutton>*{
+  height: 24px;
+  width: 24px;
+}
 
 #customBtn {
   display: inline-block;

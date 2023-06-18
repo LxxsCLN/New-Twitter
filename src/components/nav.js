@@ -37,11 +37,13 @@ function Nav(props) {
         <img onClick={()=>{
             navigate("/home", true)
           }} alt="" src={process.env.PUBLIC_URL + "logo.png"} className="homelogo"></img>
-        
-        <button className="logoutbutton" onClick={()=>{
+
+
+        {props.back ? <div className="width28"></div> : <div className="logoutbutton" onClick={()=>{
           signOut(getAuth());
           navigate("/", true)
-        }}>Log out</button>  
+        }}><img alt="" src={process.env.PUBLIC_URL + "logout.svg"}></img></div> }
+          
 
          
 

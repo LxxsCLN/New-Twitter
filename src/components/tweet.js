@@ -33,20 +33,18 @@ function Tweet(props) {
     messagingSenderId: "845912882937",
     appId: "1:845912882937:web:d1d5fe3a1fe71bc14c6c28"
   };
-
-  const [thistwt, setThisTwt] = useState()  
-
   initializeApp(firebaseConfig);   
   const auth = getAuth();
-  const navigate = useNavigate();
-  const db = getFirestore();
 
+
+  const [thistwt, setThisTwt] = useState()  
+  
   const currentUser = auth.currentUser.uid;
   const doesLike = props.tweet.userlikes.includes(auth.currentUser.uid)
-  const likeClass = doesLike ? "likedtweetbutton" : "notlikedtweetbutton";
-
   const doesRetweet = props.tweet.userretweets.includes(auth.currentUser.uid)
-  const retweetClass = doesRetweet ? "smalllogos retweetedtweetbutton" : "smalllogos notretweetedtweetbutton"; 
+  
+  const navigate = useNavigate();
+  const db = getFirestore();  
 
   const currentdate = new Date()
   const currentdateutc = currentdate.toUTCString()
@@ -54,6 +52,9 @@ function Tweet(props) {
   const currentseconds = Date.parse(currentdateutc);
   const originalseconds = Date.parse(originaldateutc);
   const secdif = (currentseconds-originalseconds)/1000  
+
+  const date2 = originaldateutc.slice(4, 11);   
+  const date3 = originaldateutc.slice(4, 11) + "," + originaldateutc.slice(11, 16); 
 
   useEffect(()=>{
     const loadtwt = async() => {
@@ -64,6 +65,11 @@ function Tweet(props) {
     }
     loadtwt()      
   }, [])  
+
+
+
+
+
 
   return (
     <div onClick={()=>{
@@ -77,7 +83,7 @@ function Tweet(props) {
         <div className="nametimetweet">
         <h4>{props.tweet.name}</h4>
         <p className="timedif">@{props.tweet.name}</p> ·
-        <p className="timedif">{secdif > 86400 ? Math.floor(secdif/86400)+"d" : secdif > 3600 ? Math.floor(secdif/3600)+"h" : secdif > 60 ? Math.floor(secdif/60)+"m" : secdif+"s"}</p>
+        <p className="timedif">{secdif > (358 * 86400) ? date3 : secdif > 86400 ? date2 : secdif > 3600 ? Math.floor(secdif/3600)+"h" : secdif > 60 ? Math.floor(secdif/60)+"m" : secdif+"s"}</p>
         </div>
 
           {currentUser === props.tweet.author ? <div className="smalllogos" onClick={(e)=>{
@@ -95,6 +101,7 @@ function Tweet(props) {
         {doesRetweet ? 
           <div className="smalllogosdiv" onClick={(e)=>{
             e.stopPropagation()
+            
             props.retweet(props.id, props.tweet.retweets, props.tweet.userretweets)          
             }}>
           <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "retweeted.svg"}></img><p className="font13">{thistwt ? thistwt.retweets : props.tweet.retweets}</p>
@@ -108,14 +115,14 @@ function Tweet(props) {
         }
 
 
-        {doesLike ?<div className="smalllogosdiv" onClick={(e)=>{
-          e.stopPropagation()
+        {doesLike ?<div  className="smalllogosdiv" onClick={(e)=>{
+          e.stopPropagation()          
           props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)          
-          }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "liked.svg"}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
+          }}><img alt="" className="smalllogos " src={process.env.PUBLIC_URL + "liked.svg"}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
         </div> : <div className="smalllogosdiv" onClick={(e)=>{
           e.stopPropagation()
           props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)          
-          }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "notliked.svg"}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
+          }}><img alt="" className="smalllogos " src={process.env.PUBLIC_URL + "notliked.svg"}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
         </div>}
         
         

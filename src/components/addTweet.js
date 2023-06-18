@@ -70,12 +70,16 @@ function AddTweet() {
         <input className="tweetinput" placeholder="What is happening?!" onChange={(e) => {
             handleChange(e)
         }} ref={empty}></input>
+
+
         <button className="submittweet" onClick={(e) => {
           e.preventDefault()
           if (tweetinput.current === "") return;
           submitTweet()
           handleClick()
         } }>Tweet</button>
+
+        
       </form>  
       </div>
     )

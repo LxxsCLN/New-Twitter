@@ -87,9 +87,7 @@ function SingleTweet(props) {
   const [user, loading] = useAuthState(auth);
   const currentUser = getAuth().currentUser.uid;
   const doesLike = props.tweet.userlikes.includes(getAuth().currentUser.uid)
-  const likeClass = doesLike ? "likedtweetbutton" : "notlikedtweetbutton";
   const doesRetweet = props.tweet.userretweets.includes(getAuth().currentUser.uid)
-  const retweetClass = doesRetweet ? "retweetedtweetbutton" : "notretweetedtweetbutton"; 
 
   const date = props.tweet.timestamp.toDate().toDateString()
   const date2 = date.slice(4, 10) + "," + date.slice(10);    
