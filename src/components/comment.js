@@ -67,28 +67,74 @@ function Comment(props) {
   const ampm = hoursindex < 12 ? " a.m. · " : " p.m. · "
   const finaldate = realhour + ":" + minutes + ampm + date2;
 
-    return (
-      <div className="comment">
+  const currentdate = new Date()
+  const currentdateutc = currentdate.toUTCString()
+  const originaldateutc = props.tweet.timestamp.toDate().toUTCString()
+  const currentseconds = Date.parse(currentdateutc);
+  const originalseconds = Date.parse(originaldateutc);
+  const secdif = (currentseconds-originalseconds)/1000
 
-        <img referrerPolicy="no-referrer" className="tweetuserimg" alt="" src={props.tweet.profilePicUrl}></img>
+    return (
+
+
+
+<div onClick={()=>{
+      navigate("/viewtweet", true)
+      props.setsingletweet(props.id)
+    }} className="tweet">  
+      
+      <img referrerPolicy="no-referrer" className="tweetuserimg" alt="" src={props.tweet.profilePicUrl}></img>
+
+      <div className="toptweetdiv">
+        <div className="nametimetweet">
         <h4>{props.tweet.name}</h4>
-        <p>{props.tweet.tweet}</p>
-        <button className={retweetClass} onClick={(e)=>{
+        <p className="timedif">@{props.tweet.name}</p> ·
+        <p className="timedif">{secdif > 86400 ? Math.floor(secdif/86400)+"d" : secdif > 3600 ? Math.floor(secdif/3600)+"h" : secdif > 60 ? Math.floor(secdif/60)+"m" : secdif+"s"}</p>
+        </div>
+          {currentUser === props.tweet.author ? <button onClick={(e)=>{
           e.stopPropagation()
-          props.retweetComment(props.docid, props.id, props.tweet.retweets, props.tweet.userretweets)          
-          }}>Retweets: {props.tweet.retweets}</button>
-        <button className={likeClass} onClick={(e)=>{
+          e.preventDefault()
+          props.deleteComment(props.docid, props.id)}} >Delete</button> : null}
+      </div>
+
+      <p className="tweettext">{props.tweet.tweet}</p>
+
+      <div className="bottweetdiv">
+       <p></p>
+
+        {doesRetweet ? 
+          <div className="smalllogosdiv" onClick={(e)=>{
+            e.stopPropagation()
+            props.retweetComment(props.docid, props.id, props.tweet.retweets, props.tweet.userretweets)            
+            }}>
+          <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "retweeted.svg"}></img><p className="font13">{thistwt ? thistwt.retweets : props.tweet.retweets}</p>
+          </div> :          
+          <div className="smalllogosdiv" onClick={(e)=>{
+            e.stopPropagation()
+            props.retweetComment(props.docid, props.id, props.tweet.retweets, props.tweet.userretweets)            
+            }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "notretweeted.svg"}></img><p className="font13">
+            {thistwt ? thistwt.retweets : props.tweet.retweets}</p>
+          </div>
+        }
+<p></p>
+
+        {doesLike ?<div className="smalllogosdiv" onClick={(e)=>{
+          e.stopPropagation()
+          props.likeComment(props.docid, props.id, props.tweet.likes, props.tweet.userlikes)  
+          }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "liked.svg"}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
+        </div> : <div className="smalllogosdiv" onClick={(e)=>{
           e.stopPropagation()
           props.likeComment(props.docid, props.id, props.tweet.likes, props.tweet.userlikes)
-          
-        }} >Likes: {thistwt ? thistwt.likes : props.tweet.likes}</button>
-        <p>{finaldate}</p>
-
-        {currentUser === props.tweet.author ? <button onClick={(e)=>{
-        e.preventDefault()
-        props.deleteComment(props.docid, props.id)}} >Delete</button> : null}
-
+          }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "notliked.svg"}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
+        </div>} 
+        <p></p>
+        <p></p>
       </div>
+
+    </div>
+
+
+      
     );
   }
   

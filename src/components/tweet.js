@@ -34,27 +34,18 @@ function Tweet(props) {
     appId: "1:845912882937:web:d1d5fe3a1fe71bc14c6c28"
   };
 
+  const [thistwt, setThisTwt] = useState()  
 
-
-  const [thistwt, setThisTwt] = useState()
-
-  
-
-
-  
-  
-
-  const app = initializeApp(firebaseConfig);  
-  const provider = new GoogleAuthProvider();  
+  initializeApp(firebaseConfig);   
   const auth = getAuth();
   const navigate = useNavigate();
   const db = getFirestore();
 
-  const currentUser = getAuth().currentUser.uid;
-  const doesLike = props.tweet.userlikes.includes(getAuth().currentUser.uid)
+  const currentUser = auth.currentUser.uid;
+  const doesLike = props.tweet.userlikes.includes(auth.currentUser.uid)
   const likeClass = doesLike ? "likedtweetbutton" : "notlikedtweetbutton";
 
-  const doesRetweet = props.tweet.userretweets.includes(getAuth().currentUser.uid)
+  const doesRetweet = props.tweet.userretweets.includes(auth.currentUser.uid)
   const retweetClass = doesRetweet ? "smalllogos retweetedtweetbutton" : "smalllogos notretweetedtweetbutton"; 
 
   const currentdate = new Date()
@@ -66,7 +57,7 @@ function Tweet(props) {
 
   useEffect(()=>{
     const loadtwt = async() => {
-      const docRef = doc(getFirestore(), "Tweets", props.id);
+      const docRef = doc(db, "Tweets", props.id);
       const docSnap = await getDoc(docRef);
       const tweet = docSnap.data();
       setThisTwt(tweet) 
@@ -97,27 +88,32 @@ function Tweet(props) {
       <p className="tweettext">{props.tweet.tweet}</p>
 
       <div className="bottweetdiv">
-        <p> <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "comment.svg"}></img> {props.tweet.comments}</p>
+        <div className="smalllogosdiv"> <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "comment.svg"}></img><p className="font13">{props.tweet.comments}</p></div>
+
         {doesRetweet ? 
-        <div onClick={(e)=>{
-          e.stopPropagation()
-          props.retweet(props.id, props.tweet.retweets, props.tweet.userretweets)          
-          }}>
-        <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "retweeted.svg"}></img>{thistwt ? thistwt.retweets : props.tweet.retweets}</div> : 
-          
-          <div onClick={(e)=>{
+          <div className="smalllogosdiv" onClick={(e)=>{
             e.stopPropagation()
             props.retweet(props.id, props.tweet.retweets, props.tweet.userretweets)          
-            }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "notretweeted.svg"}></img>
-            {thistwt ? thistwt.retweets : props.tweet.retweets}</div>}
-        {doesLike ?<div onClick={(e)=>{
+            }}>
+          <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "retweeted.svg"}></img><p className="font13">{thistwt ? thistwt.retweets : props.tweet.retweets}</p>
+          </div> :          
+          <div className="smalllogosdiv" onClick={(e)=>{
+            e.stopPropagation()
+            props.retweet(props.id, props.tweet.retweets, props.tweet.userretweets)          
+            }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "notretweeted.svg"}></img><p className="font13">
+            {thistwt ? thistwt.retweets : props.tweet.retweets}</p>
+          </div>
+        }
+
+
+        {doesLike ?<div className="smalllogosdiv" onClick={(e)=>{
           e.stopPropagation()
           props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)          
-          }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "liked.svg"}></img>{thistwt ? thistwt.likes : props.tweet.likes}
-        </div> : <div onClick={(e)=>{
+          }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "liked.svg"}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
+        </div> : <div className="smalllogosdiv" onClick={(e)=>{
           e.stopPropagation()
           props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)          
-          }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "notliked.svg"}></img>{thistwt ? thistwt.likes : props.tweet.likes}
+          }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "notliked.svg"}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
         </div>}
         
         
