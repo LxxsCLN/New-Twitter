@@ -38,16 +38,7 @@ function Tweet(props) {
 
   const [thistwt, setThisTwt] = useState()
 
-  useEffect(()=>{
-
-    const loadtwt = async() => {
-      const docRef = doc(getFirestore(), "Tweets", props.id);
-      const docSnap = await getDoc(docRef);
-      const tweet = docSnap.data();
-      setThisTwt(tweet)
-    }
-    loadtwt()    
-  }, [])  
+  
 
 
   
@@ -58,45 +49,84 @@ function Tweet(props) {
   const auth = getAuth();
   const navigate = useNavigate();
   const db = getFirestore();
-  
-  // const [user, loading] = useAuthState(auth);
 
   const currentUser = getAuth().currentUser.uid;
   const doesLike = props.tweet.userlikes.includes(getAuth().currentUser.uid)
   const likeClass = doesLike ? "likedtweetbutton" : "notlikedtweetbutton";
 
+  const doesRetweet = props.tweet.userretweets.includes(getAuth().currentUser.uid)
+  const retweetClass = doesRetweet ? "smalllogos retweetedtweetbutton" : "smalllogos notretweetedtweetbutton"; 
 
-  const time = props.tweet.timestamp.toDate().toLocaleTimeString()
-  const hour2 = `${time.slice(0,4) + time.slice(7, 9).toLowerCase()}.${time.slice(9, 10).toLowerCase()}. · `
-  const date = props.tweet.timestamp.toDate().toDateString()
-  const date2 = date.slice(4, 10) + "," + date.slice(10);  
-  const finaldate = hour2 + date2;
+  const currentdate = new Date()
+  const currentdateutc = currentdate.toUTCString()
+  const originaldateutc = props.tweet.timestamp.toDate().toUTCString()
+  const currentseconds = Date.parse(currentdateutc);
+  const originalseconds = Date.parse(originaldateutc);
+  const secdif = (currentseconds-originalseconds)/1000  
 
-    return (
-      <div onClick={()=>{
-        navigate("/viewtweet", true)
-        props.setsingletweet(props.id)
-      }} className="tweet">
+  useEffect(()=>{
+    const loadtwt = async() => {
+      const docRef = doc(getFirestore(), "Tweets", props.id);
+      const docSnap = await getDoc(docRef);
+      const tweet = docSnap.data();
+      setThisTwt(tweet) 
+    }
+    loadtwt()      
+  }, [])  
 
-      {currentUser === props.tweet.author ? <button onClick={(e)=>{
-        e.stopPropagation()
-        e.preventDefault()
-        props.deleteTweet(props.id)}} >Delete</button> : null}
-             
+  return (
+    <div onClick={()=>{
+      navigate("/viewtweet", true)
+      props.setsingletweet(props.id)
+    }} className="tweet">  
+      
+      <img referrerPolicy="no-referrer" className="tweetuserimg" alt="" src={props.tweet.profilePicUrl}></img>
 
-        <img alt="" src={props.tweet.profilePicUrl || ""}></img>
+      <div className="toptweetdiv">
+        <div className="nametimetweet">
         <h4>{props.tweet.name}</h4>
-        <p>{props.tweet.tweet}</p>
-        <button className={likeClass} onClick={(e)=>{
+        <p className="timedif">@{props.tweet.name}</p> ·
+        <p className="timedif">{secdif > 86400 ? Math.floor(secdif/86400)+"d" : secdif > 3600 ? Math.floor(secdif/3600)+"h" : secdif > 60 ? Math.floor(secdif/60)+"m" : secdif+"s"}</p>
+        </div>
+          {currentUser === props.tweet.author ? <button onClick={(e)=>{
           e.stopPropagation()
-          props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)
-          
-        }} >Likes: {thistwt ? thistwt.likes : props.tweet.likes}</button>
-        <p>Comments: {props.tweet.comments}</p>
-        <p>{finaldate}</p>
-
+          e.preventDefault()
+          props.deleteTweet(props.id)}} >Delete</button> : null}
       </div>
-    );
-  }
-  
-  export default Tweet;
+
+      <p className="tweettext">{props.tweet.tweet}</p>
+
+      <div className="bottweetdiv">
+        <p> <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "comment.svg"}></img> {props.tweet.comments}</p>
+        {doesRetweet ? 
+        <div onClick={(e)=>{
+          e.stopPropagation()
+          props.retweet(props.id, props.tweet.retweets, props.tweet.userretweets)          
+          }}>
+        <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "retweeted.svg"}></img>{thistwt ? thistwt.retweets : props.tweet.retweets}</div> : 
+          
+          <div onClick={(e)=>{
+            e.stopPropagation()
+            props.retweet(props.id, props.tweet.retweets, props.tweet.userretweets)          
+            }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "notretweeted.svg"}></img>
+            {thistwt ? thistwt.retweets : props.tweet.retweets}</div>}
+        {doesLike ?<div onClick={(e)=>{
+          e.stopPropagation()
+          props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)          
+          }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "liked.svg"}></img>{thistwt ? thistwt.likes : props.tweet.likes}
+        </div> : <div onClick={(e)=>{
+          e.stopPropagation()
+          props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)          
+          }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "notliked.svg"}></img>{thistwt ? thistwt.likes : props.tweet.likes}
+        </div>}
+        
+        
+
+        <p></p>
+      </div>
+
+    </div>
+  );
+}
+
+export default Tweet;

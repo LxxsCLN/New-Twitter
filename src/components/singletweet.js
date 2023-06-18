@@ -70,6 +70,8 @@ function SingleTweet(props) {
         profilePicUrl: getAuth().currentUser.photoURL || null,
         timestamp: serverTimestamp(),
         likes: 0,
+        retweets: 0,
+        userretweets: [],
         userlikes: []
       });
     }
@@ -86,32 +88,53 @@ function SingleTweet(props) {
   const currentUser = getAuth().currentUser.uid;
   const doesLike = props.tweet.userlikes.includes(getAuth().currentUser.uid)
   const likeClass = doesLike ? "likedtweetbutton" : "notlikedtweetbutton";
+  const doesRetweet = props.tweet.userretweets.includes(getAuth().currentUser.uid)
+  const retweetClass = doesRetweet ? "retweetedtweetbutton" : "notretweetedtweetbutton"; 
 
-  const time = props.tweet.timestamp.toDate().toLocaleTimeString()
-  const hour2 = `${time.slice(0,4) + time.slice(7, 9).toLowerCase()}.${time.slice(9, 10).toLowerCase()}. · `
   const date = props.tweet.timestamp.toDate().toDateString()
-  const date2 = date.slice(4, 10) + "," + date.slice(10);  
-  const finaldate = hour2 + date2;
+  const date2 = date.slice(4, 10) + "," + date.slice(10);    
+
+  const hoursarray = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+  const hoursindex = props.tweet.timestamp.toDate().getHours()
+  const minutes = props.tweet.timestamp.toDate().getMinutes()
+  const realhour = hoursarray[hoursindex]
+  const ampm = hoursindex < 12 ? " a.m. · " : " p.m. · "
+  const finaldate = realhour + ":" + minutes + ampm + date2;
+
   
   return (
-    <div className="SingleTweet">
+    <div>
+    <div className="singletweet">       
+             
+        <img className=" tweetuserimg tweetuserimgsingle " alt="" src={props.tweet.profilePicUrl}></img>
 
+        <div className="toptweetdiv">
+        <p className="singletweetname">{props.tweet.name}</p>
         {currentUser === props.tweet.author ? <button onClick={(e)=>{
         e.preventDefault()
         props.deleteTweet(props.id)
         navigate("/home", true)
         }} >Delete</button> : null}
-             
-        <img alt="" src={props.tweet.profilePicUrl || ""}></img>
-        <h4>{props.tweet.name}</h4>
-        <p>{props.tweet.tweet}</p>
-        <button className={likeClass} onClick={(e)=>{
-          e.stopPropagation()
-          props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)
-          
-        }} >Likes: {props.tweet.likes}</button>
+        
+        </div>
+        <p className="timedif">@{props.tweet.name}</p>
+        <p className="singletweettext spantwocolumn">{props.tweet.tweet}</p>
+        <p className="finaldate spantwocolumn">{finaldate}</p>
+        
+          <div className="bottweetdiv bottweetdiv2 spantwocolumn">
         <p>Comments: {props.tweet.comments}</p>
-        <p>{finaldate}</p>
+          <button className={retweetClass} onClick={(e)=>{
+            e.stopPropagation()
+            props.retweet(props.id, props.tweet.retweets, props.tweet.userretweets)          
+            }}>Retweets: {props.tweet.retweets}</button>
+          <button className={likeClass} onClick={(e)=>{
+            e.stopPropagation()
+            props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)            
+          }} >Likes: {props.tweet.likes}</button>    
+          
+          </div>
+        </div>
+
         <form>
           <input ref={empty} onChange={handleChange} className="commentinput" placeholder="Escribe tu comentario..."></input>
           <button onClick={(e)=>{

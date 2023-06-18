@@ -30,28 +30,20 @@ function Nav(props) {
 
     return (
       <div className="nav">
-        <div className="topnav">
-        <img src={user ? user.photoURL : ""} alt="" className="userlogo"></img> 
-        <img alt="" src={process.env.PUBLIC_URL + "logo.png"} className="homelogo"></img>
+          {props.back ? <div onClick={()=>{
+            navigate("/home", true)
+          }} className="backsvgdiv"><img  className="backsvg" alt="" src={process.env.PUBLIC_URL + "back.svg"}></img></div>  : <img referrerPolicy="no-referrer" src={user ? user.photoURL : process.env.PUBLIC_URL + "profilepic.png"} alt="" className="userlogo"></img>}
+        
+        <img onClick={()=>{
+            navigate("/home", true)
+          }} alt="" src={process.env.PUBLIC_URL + "logo.png"} className="homelogo"></img>
         
         <button className="logoutbutton" onClick={()=>{
           signOut(getAuth());
-          navigate("/")
+          navigate("/", true)
         }}>Log out</button>  
-        </div>
 
-
-
-        {/* {props.isSingleTweet ? null : <form className="writetweet">
-        <input className="tweetinput" placeholder="What is happening?!" onChange={props.handleChange} ref={empty}></input>
-        <button className="submittweet" onClick={(e) => {
-          e.preventDefault()
-          props.submitTweet()
-          handleClick()
-        } }>Tweet</button>
-      </form>  } */}
-
-          
+         
 
       </div>
     );

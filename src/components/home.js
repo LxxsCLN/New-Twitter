@@ -82,6 +82,28 @@ function Home(props) {
       setIsLiked(!isLiked)
   }
 
+  async function retweet(id, retweets, usrretweets){
+
+    const doesRetweet = usrretweets.includes(getAuth().currentUser.uid)
+    const newuserretweets = [...usrretweets] 
+    const currTWT = doc(getFirestore(), "Tweets", id);
+    let newretweets = retweets;
+
+    if (!doesRetweet){
+      newretweets += 1;
+      newuserretweets.push(getAuth().currentUser.uid)  
+    } else {
+      let index = usrretweets.indexOf(getAuth().currentUser.uid)
+      newuserretweets.splice(index, 1); 
+      newretweets -= 1; 
+    }
+    await updateDoc(currTWT, {
+      retweets: newretweets,
+      userretweets: newuserretweets,
+      });
+    setIsLiked(!isLiked)
+  }
+
    
 
   const [tweetsarray, setTweetsArray] = useState([]);
@@ -93,7 +115,7 @@ useEffect(()=>{
     const tweetQuery = await getDocs(query(collection(getFirestore(), "Tweets"), orderBy("timestamp", "desc"), limit(20)))
     tweetQuery.forEach((doc) => {
       const data = doc.data()      
-      twarr.push(<Tweet key={uniqid()} tweet={data} id={doc.id} setsingletweet={props.setsingletweet} likeTweet={likeTweet} deleteTweet={deleteTweet} />)
+      twarr.push(<Tweet key={uniqid()} tweet={data} id={doc.id} setsingletweet={props.setsingletweet} likeTweet={likeTweet} deleteTweet={deleteTweet} retweet={retweet} />)
     });
     setTweetsArray(twarr)
   }

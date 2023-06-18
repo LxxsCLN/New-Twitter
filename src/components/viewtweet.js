@@ -39,6 +39,7 @@ import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 
 function ViewTweet(props) {
   const [isLiked, setIsLiked] = useState(false)
+  const db = getFirestore();
 
   async function likeTweet(id, likes, usrlikes){
 
@@ -61,7 +62,29 @@ function ViewTweet(props) {
       });
     setIsLiked(!isLiked)
   }
-  const db = getFirestore();
+  
+
+  async function retweet(id, retweets, usrretweets){
+
+    const doesLike = usrretweets.includes(getAuth().currentUser.uid)
+    const newuserretweets = [...usrretweets] 
+    const currTWT = doc(getFirestore(), "Tweets", id);
+    let newretweets = retweets;
+
+    if (!doesLike){
+      newretweets += 1;
+      newuserretweets.push(getAuth().currentUser.uid)  
+    } else {
+      let index = usrretweets.indexOf(getAuth().currentUser.uid)
+      newuserretweets.splice(index, 1); 
+      newretweets -= 1; 
+    }
+    await updateDoc(currTWT, {
+      retweets: newretweets,
+      userretweets: newuserretweets,
+      });
+    setIsLiked(!isLiked)
+  }
 
 
   async function likeComment(docid, id, likes, usrlikes){
@@ -82,6 +105,28 @@ function ViewTweet(props) {
     await updateDoc(currTWT, {
       likes: newlikes,
       userlikes: newuserlikes,
+      });
+    setIsLiked(!isLiked)
+  }
+
+  async function retweetComment(docid, id, retweets, usrretweets){
+
+    const doesRetweet = usrretweets.includes(getAuth().currentUser.uid)
+    const newuserretweets = [...usrretweets] 
+    const currTWT = doc(getFirestore(), "Tweets", docid, "Comments", id);
+    let newretweets = retweets;
+
+    if (!doesRetweet){
+      newretweets += 1;
+      newuserretweets.push(getAuth().currentUser.uid)  
+    } else {
+      let index = usrretweets.indexOf(getAuth().currentUser.uid)
+      newuserretweets.splice(index, 1); 
+      newretweets -= 1; 
+    }
+    await updateDoc(currTWT, {
+      retweets: newretweets,
+      userretweets: newuserretweets,
       });
     setIsLiked(!isLiked)
   }
@@ -123,7 +168,7 @@ function ViewTweet(props) {
       querySnapshot.forEach( async(doc) => {
         const data = doc.data()
         if (doc.id === props.thisTweet){
-          thistwt = <SingleTweet likeTweet={likeTweet} key={uniqid()} tweet={data} id={doc.id} handleChange={handleChange} isLiked={isLiked} setIsLiked={setIsLiked} deleteTweet={deleteTweet} />
+          thistwt = <SingleTweet retweet={retweet} likeTweet={likeTweet} key={uniqid()} tweet={data} id={doc.id} handleChange={handleChange} isLiked={isLiked} setIsLiked={setIsLiked} deleteTweet={deleteTweet} />
           loadComments(doc.id)
         }
       });      
@@ -135,7 +180,7 @@ function ViewTweet(props) {
       const queryComments = await getDocs(query(collection(getFirestore(), "Tweets", docid, "Comments"), orderBy('timestamp', 'desc'), limit(10)));
       queryComments.forEach((doc2) => {
        const data2 = doc2.data()
-       comments1.push(<Comment tweet={data2} key={uniqid()} id={doc2.id} docid={docid} likeComment={likeComment} deleteComment={deleteComment} />)
+       comments1.push(<Comment retweetComment={retweetComment} tweet={data2} key={uniqid()} id={doc2.id} docid={docid} likeComment={likeComment} deleteComment={deleteComment} />)
      }) 
      setComms(comments1)
     }
@@ -148,7 +193,7 @@ function ViewTweet(props) {
     return (
                 
       <div className="ViewTweet">
-        <Nav isSingleTweet={true} />
+        <Nav back={true} />
         {tweet}
         {comms}
       </div>

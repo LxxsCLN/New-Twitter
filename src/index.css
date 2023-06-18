@@ -18,6 +18,8 @@
   src:  url('/src/fonts/chirp-medium-web.woff') format('woff')
 }  */
 
+
+
 *{
   margin: 0;
   padding: 0;
@@ -63,7 +65,11 @@ h1{
 }
 
 .likedtweetbutton{
-  background-color: red;
+  background-color: rgb(255, 131, 131);
+}
+
+.retweetedtweetbutton{
+  background-color: rgb(166, 255, 170);
 }
 
 .nav{
@@ -72,19 +78,137 @@ h1{
   top: 0px;
   background-color: white;
   padding: 10px;
-}
-
-.topnav{
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
+  height: 42px;
 }
+
 
 .tweet{
   border: 1px solid blue;
+  display: grid;
+  grid-template-columns: 1fr 5fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  row-gap: 5px;
+  padding: 5px;
+}
+
+.backsvgdiv{
+  height: 32px;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+}
+
+.tweettext{
+  text-justify: center;
+}
+
+.backsvg{
+  height: 20px;
+  width: 20px;
+}
+
+.tweetuserimg{
+  height: 40px;
+  width: 40px;
+  border-radius: 100%;
+  grid-row: span 3;  
+}
+
+.toptweetdiv{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nametimetweet{
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.timedif{
+  color: rgb(83, 100, 113);
+}
+
+.bottweetdiv{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  
+}
+
+.bottweetdiv2{
+  border-top: 1px solid rgba(0, 0, 0, .1);
+  border-bottom: 1px solid rgba(0, 0, 0, .1);
+  justify-content: space-around;
+}
+
+.smalllogos{
+  height: 19px;
+  width: 20px;
 }
 
 
+.singletweet{
+  display: grid;
+  grid-template-columns: 1fr 5fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1.5fr;
+  row-gap: 10px;
+  padding: 15px;
+}
+
+.singletweet>*:nth-child(3){
+  margin-top: -8px;
+}
+
+.singletweet>*:nth-child(4){
+  margin-top: -8px;
+  padding: 1px 0px;
+}
+.singletweet>*:nth-child(5){
+  margin-top: -8px;
+  padding: 1px 0px;
+}
+.singletweet>*:nth-child(6){
+  margin-top: -8px;
+  padding: 1px 0px;
+}
+
+.singletweettext{
+  font-size: 17px;
+}
+
+.singletweetname{
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.tweetuserimgsingle{
+  grid-row: span 2;
+}
+
+.finaldate{
+}
+
+.spantwocolumn{
+  grid-column: span 2;
+}
+
+.finaldate{
+  font-size: 15px;
+  color: rgb(83, 100, 113);
+}
 
 
 #customBtn {
@@ -119,3 +243,5 @@ span.buttonText {
   /* Use the Roboto font that is loaded in the <head> */
   font-family: 'Roboto', sans-serif;
 }
+
+

@@ -22,6 +22,7 @@ import {
   getDocs,
   serverTimestamp,
 } from 'firebase/firestore';
+import Nav from "./nav";
 
 
 function AddTweet() {
@@ -49,8 +50,10 @@ function AddTweet() {
             profilePicUrl: getAuth().currentUser.photoURL || null,
             timestamp: serverTimestamp(),
             likes: 0,
+            retweets: 0,
             comments: 0,
             userlikes: [],
+            userretweets: [],
           });
         }
         catch(error) {
@@ -62,6 +65,7 @@ function AddTweet() {
   
     return (
       <div>
+        <Nav back={true} />
         <form className="writetweet">
         <input className="tweetinput" placeholder="What is happening?!" onChange={(e) => {
             handleChange(e)

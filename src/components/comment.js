@@ -54,19 +54,29 @@ function Comment(props) {
   const currentUser = getAuth().currentUser.uid;
   const doesLike = props.tweet.userlikes.includes(getAuth().currentUser.uid)
   const likeClass = doesLike ? "likedtweetbutton" : "notlikedtweetbutton";
+  const doesRetweet = props.tweet.userretweets.includes(getAuth().currentUser.uid)
+  const retweetClass = doesRetweet ? "retweetedtweetbutton" : "notretweetedtweetbutton"; 
 
-  const time = props.tweet.timestamp.toDate().toLocaleTimeString()
-  const hour2 = `${time.slice(0,4) + time.slice(7, 9).toLowerCase()}.${time.slice(9, 10).toLowerCase()}. · `
   const date = props.tweet.timestamp.toDate().toDateString()
-  const date2 = date.slice(4, 10) + "," + date.slice(10);  
-  const finaldate = hour2 + date2;
+  const date2 = date.slice(4, 10) + "," + date.slice(10);    
+
+  const hoursarray = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+  const hoursindex = props.tweet.timestamp.toDate().getHours()
+  const minutes = props.tweet.timestamp.toDate().getMinutes()
+  const realhour = hoursarray[hoursindex]
+  const ampm = hoursindex < 12 ? " a.m. · " : " p.m. · "
+  const finaldate = realhour + ":" + minutes + ampm + date2;
 
     return (
       <div className="comment">
 
-        <img alt="" src={props.tweet.profilePicUrl || ""}></img>
+        <img referrerPolicy="no-referrer" className="tweetuserimg" alt="" src={props.tweet.profilePicUrl}></img>
         <h4>{props.tweet.name}</h4>
         <p>{props.tweet.tweet}</p>
+        <button className={retweetClass} onClick={(e)=>{
+          e.stopPropagation()
+          props.retweetComment(props.docid, props.id, props.tweet.retweets, props.tweet.userretweets)          
+          }}>Retweets: {props.tweet.retweets}</button>
         <button className={likeClass} onClick={(e)=>{
           e.stopPropagation()
           props.likeComment(props.docid, props.id, props.tweet.likes, props.tweet.userlikes)
