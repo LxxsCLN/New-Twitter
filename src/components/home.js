@@ -43,15 +43,22 @@ function Home(props) {
     messagingSenderId: "845912882937",
     appId: "1:845912882937:web:d1d5fe3a1fe71bc14c6c28"
   };
-  
+  const navigate = useNavigate();
   const app = initializeApp(firebaseConfig);  
   const provider = new GoogleAuthProvider();  
   const auth = getAuth();
   const db = getFirestore();
 
-  let tweetinput = useRef("");
   
   const [isLiked, setIsLiked] = useState(false)
+
+
+  async function deleteTweet(id){
+    await deleteDoc(doc(db, "Tweets", id));
+    setIsLiked(!isLiked)
+  }
+
+  
  
   async function likeTweet(id, likes, usrlikes){
 
@@ -75,29 +82,7 @@ function Home(props) {
       setIsLiked(!isLiked)
   }
 
-  const handleChange = (event) => {
-    tweetinput.current = event.target.value;
-  };
-
-  async function submitTweet(){
-    try {
-      await addDoc(collection(getFirestore(), "Tweets"), {
-        author: getAuth().currentUser.uid,
-        tweet: tweetinput.current,
-        name: getAuth().currentUser.displayName,
-        profilePicUrl: getAuth().currentUser.photoURL || null,
-        timestamp: serverTimestamp(),
-        likes: 0,
-        comments: 0,
-        userlikes: [],
-      });
-    }
-    catch(error) {
-      console.error('Error writing new message to Firebase Database', error);
-    }
-    tweetinput.current = ""
-    setIsLiked(!isLiked)
-  } 
+   
 
   const [tweetsarray, setTweetsArray] = useState([]);
 
@@ -108,7 +93,7 @@ useEffect(()=>{
     const tweetQuery = await getDocs(query(collection(getFirestore(), "Tweets"), orderBy("timestamp", "desc"), limit(20)))
     tweetQuery.forEach((doc) => {
       const data = doc.data()      
-      twarr.push(<Tweet key={uniqid()} tweet={data} id={doc.id} setsingletweet={props.setsingletweet} likeTweet={likeTweet} />)
+      twarr.push(<Tweet key={uniqid()} tweet={data} id={doc.id} setsingletweet={props.setsingletweet} likeTweet={likeTweet} deleteTweet={deleteTweet} />)
     });
     setTweetsArray(twarr)
   }
@@ -119,8 +104,13 @@ useEffect(()=>{
   return (
     
     <div className="Home">
-      <Nav submitTweet={submitTweet} handleChange={handleChange} />
+      <Nav />
       {tweetsarray}
+
+      <button onClick={()=>{
+        navigate("/addtweet", true)
+      } } className="addtweetbutton">Write Tweet</button>
+
       </div>
   );
 }

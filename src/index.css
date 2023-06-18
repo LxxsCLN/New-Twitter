@@ -53,8 +53,6 @@ h1{
 }
 
 #root{
-  padding: 15px;
-  padding-bottom: 100px;
 }
 
 .login{
@@ -64,8 +62,22 @@ h1{
   align-items: center;
 }
 
+.likedtweetbutton{
+  background-color: red;
+}
+
 .nav{
   border: 1px solid black;
+  position: sticky;
+  top: 0px;
+  background-color: white;
+  padding: 10px;
+}
+
+.topnav{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .tweet{

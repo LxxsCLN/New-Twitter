@@ -38,6 +38,7 @@ import Home from "./components/home";
 import ViewTweet from "./components/viewtweet";
 import Tweet from "./components/tweet";
 import uniqid from 'uniqid';
+import AddTweet from './components/addTweet';
 
 
 function App() {
@@ -54,6 +55,7 @@ function setsingletweet(docid){
       <Route path="/" element={<Login />} />
       <Route path="/home" element={<Home setsingletweet={setsingletweet} />} />
       <Route path="/viewtweet" element={<ViewTweet thisTweet={thisTweet} />} />
+      <Route path='/addtweet' element={<AddTweet />} />
       </Routes>
     </HashRouter>
   );

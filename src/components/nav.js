@@ -30,6 +30,7 @@ function Nav(props) {
 
     return (
       <div className="nav">
+        <div className="topnav">
         <img src={user ? user.photoURL : ""} alt="" className="userlogo"></img> 
         <img alt="" src={process.env.PUBLIC_URL + "logo.png"} className="homelogo"></img>
         
@@ -37,14 +38,21 @@ function Nav(props) {
           signOut(getAuth());
           navigate("/")
         }}>Log out</button>  
-        <form className="writetweet">
+        </div>
+
+
+
+        {/* {props.isSingleTweet ? null : <form className="writetweet">
         <input className="tweetinput" placeholder="What is happening?!" onChange={props.handleChange} ref={empty}></input>
         <button className="submittweet" onClick={(e) => {
           e.preventDefault()
           props.submitTweet()
           handleClick()
         } }>Tweet</button>
-      </form>    
+      </form>  } */}
+
+          
+
       </div>
     );
   }

@@ -2,7 +2,7 @@ import { GoogleAuthProvider, getAuth, signInWithRedirect, getRedirectResult, sig
 import { initializeApp } from "firebase/app";
 import React from "react"
 import { useNavigate, } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import uniqid from 'uniqid';
 
@@ -41,20 +41,31 @@ function SingleTweet(props) {
 
   const db = getFirestore();
 
-  const [tweet, setTweet] = useState("");
+  let tweetinput = useRef("");
+  
+  // const [tweet, setTweet] = useState("");
 
   const handleChange = (event) => {
-    setTweet(event.target.value);
+    tweetinput.current = event.target.value;
   };
+
+  const empty = useRef("")
+
+  function handleClick(){
+    empty.current.value = ""
+  }
+
+  // const [isLiked, setIsLiked] = useState(false)
   
-  async function addComment(){
+  async function addComment(e){
+    e.preventDefault()
     const docRef = doc(getFirestore(), "Tweets", props.id);
       const docSnap = await getDoc(docRef);
       const tweet2 = docSnap.data();
     try {
       await addDoc(collection(getFirestore(), "Tweets", props.id, "Comments"), {
         author: getAuth().currentUser.uid,
-        tweet: tweet,
+        tweet: tweetinput.current,
         name: getAuth().currentUser.displayName,
         profilePicUrl: getAuth().currentUser.photoURL || null,
         timestamp: serverTimestamp(),
@@ -68,22 +79,45 @@ function SingleTweet(props) {
     await updateDoc(docRef, {
       comments: tweet2.comments + 1
       });
+      tweetinput.current = ""
+      props.setIsLiked(!props.isLiked)
   }
 
+  const currentUser = getAuth().currentUser.uid;
+  const doesLike = props.tweet.userlikes.includes(getAuth().currentUser.uid)
+  const likeClass = doesLike ? "likedtweetbutton" : "notlikedtweetbutton";
+
+  const time = props.tweet.timestamp.toDate().toLocaleTimeString()
+  const hour2 = `${time.slice(0,4) + time.slice(7, 9).toLowerCase()}.${time.slice(9, 10).toLowerCase()}. · `
+  const date = props.tweet.timestamp.toDate().toDateString()
+  const date2 = date.slice(4, 10) + "," + date.slice(10);  
+  const finaldate = hour2 + date2;
   
   return (
     <div className="SingleTweet">
 
+        {currentUser === props.tweet.author ? <button onClick={(e)=>{
+        e.preventDefault()
+        props.deleteTweet(props.id)
+        navigate("/home", true)
+        }} >Delete</button> : null}
              
         <img alt="" src={props.tweet.profilePicUrl || ""}></img>
         <h4>{props.tweet.name}</h4>
         <p>{props.tweet.tweet}</p>
-        <button>Likes: {props.tweet.likes}</button>
+        <button className={likeClass} onClick={(e)=>{
+          e.stopPropagation()
+          props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)
+          
+        }} >Likes: {props.tweet.likes}</button>
         <p>Comments: {props.tweet.comments}</p>
-        <p>Date: {props.tweet.timestamp.toMillis()}</p>
+        <p>{finaldate}</p>
         <form>
-          <input onChange={handleChange} className="commentinput" placeholder="Escribe tu comentario..."></input>
-          <button onClick={addComment} >Comentar</button>
+          <input ref={empty} onChange={handleChange} className="commentinput" placeholder="Escribe tu comentario..."></input>
+          <button onClick={(e)=>{
+            handleClick(e)
+            addComment(e)
+          } } >Comentar</button>
         </form>
 
 

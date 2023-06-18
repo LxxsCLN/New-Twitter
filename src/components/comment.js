@@ -5,8 +5,26 @@ import { useNavigate, } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  limit,
+  onSnapshot,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  serverTimestamp,
+} from 'firebase/firestore';
 
 function Comment(props) {
+
+  const [thistwt, setThisTwt] = useState()
 
   const firebaseConfig = {
     apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
@@ -21,7 +39,27 @@ function Comment(props) {
   const provider = new GoogleAuthProvider();  
   const auth = getAuth();
   const navigate = useNavigate();
+
+  useEffect(()=>{
+
+    const loadtwt = async() => {
+      const docRef = doc(getFirestore(), "Tweets", props.docid, "Comments", props.id);
+      const docSnap = await getDoc(docRef);
+      const tweet = docSnap.data();
+      setThisTwt(tweet)
+    }
+    loadtwt()    
+  }, [])
   
+  const currentUser = getAuth().currentUser.uid;
+  const doesLike = props.tweet.userlikes.includes(getAuth().currentUser.uid)
+  const likeClass = doesLike ? "likedtweetbutton" : "notlikedtweetbutton";
+
+  const time = props.tweet.timestamp.toDate().toLocaleTimeString()
+  const hour2 = `${time.slice(0,4) + time.slice(7, 9).toLowerCase()}.${time.slice(9, 10).toLowerCase()}. · `
+  const date = props.tweet.timestamp.toDate().toDateString()
+  const date2 = date.slice(4, 10) + "," + date.slice(10);  
+  const finaldate = hour2 + date2;
 
     return (
       <div className="comment">
@@ -29,8 +67,16 @@ function Comment(props) {
         <img alt="" src={props.tweet.profilePicUrl || ""}></img>
         <h4>{props.tweet.name}</h4>
         <p>{props.tweet.tweet}</p>
-        <button>Likes: {props.tweet.likes}</button>
-        <p>Date: {111111}</p>
+        <button className={likeClass} onClick={(e)=>{
+          e.stopPropagation()
+          props.likeComment(props.docid, props.id, props.tweet.likes, props.tweet.userlikes)
+          
+        }} >Likes: {thistwt ? thistwt.likes : props.tweet.likes}</button>
+        <p>{finaldate}</p>
+
+        {currentUser === props.tweet.author ? <button onClick={(e)=>{
+        e.preventDefault()
+        props.deleteComment(props.docid, props.id)}} >Delete</button> : null}
 
       </div>
     );
