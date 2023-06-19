@@ -1,7 +1,5 @@
-import { GoogleAuthProvider, getAuth, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "firebase/auth";
-import { initializeApp } from "firebase/app";
+import { getAuth} from "firebase/auth";
 import React from "react"
-import { useNavigate, } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Nav from "./nav";
 import SingleTweet from "./singletweet";
@@ -12,30 +10,15 @@ import uniqid from 'uniqid';
 import {
   getFirestore,
   collection,
-  addDoc,
   query,
   orderBy,
   limit,
-  onSnapshot,
-  setDoc,
   updateDoc,
   deleteDoc,
   doc,
   getDoc,
   getDocs,
-  serverTimestamp,
 } from 'firebase/firestore';
-
-import {
-  getStorage,
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-} from 'firebase/storage';
-
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
-
-
 
 function ViewTweet(props) {
   const [isLiked, setIsLiked] = useState(false)

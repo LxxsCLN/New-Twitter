@@ -1,25 +1,13 @@
-import { GoogleAuthProvider, getAuth, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "firebase/auth";
+import { GoogleAuthProvider, getAuth,} from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import React from "react"
 import { useNavigate, } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
 
 import {
   getFirestore,
-  collection,
-  addDoc,
-  query,
-  orderBy,
-  limit,
-  onSnapshot,
-  setDoc,
-  updateDoc,
-  deleteDoc,
   doc,
   getDoc,
-  getDocs,
-  serverTimestamp,
 } from 'firebase/firestore';
 
 function Comment(props) {

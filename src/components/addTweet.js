@@ -1,25 +1,15 @@
-import { GoogleAuthProvider, getAuth, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "firebase/auth";
-import { initializeApp } from "firebase/app";
+import {  getAuth, } from "firebase/auth";
 import React from "react"
 import { useNavigate, } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
+import {  useRef } from "react";
 
 
 import {
   getFirestore,
   collection,
   addDoc,
-  query,
-  orderBy,
-  limit,
-  onSnapshot,
-  setDoc,
-  updateDoc,
-  deleteDoc,
   doc,
   getDoc,
-  getDocs,
   serverTimestamp,
 } from 'firebase/firestore';
 import Nav from "./nav";
@@ -36,14 +26,11 @@ function AddTweet() {
     let tweetinput = useRef("");      
     const empty = useRef("")
 
-    function handleClick(){
-        
-      empty.current.value = ""
-    }
+    
 
     async function submitTweet(){
+      
         try {
-
           const docRef = doc(getFirestore(), "Users", getAuth().currentUser.uid);
           const docSnap = await getDoc(docRef);
           const authordata = docSnap.data()
@@ -62,12 +49,13 @@ function AddTweet() {
             isverified: authordata.isverified,
             isverifiedgold: authordata.isverifiedgold,
           });
+          navigate("/home", true)
         }
         catch(error) {
           console.error('Error writing new message to Firebase Database', error);
         }
         tweetinput.current = ""
-        navigate("/home", true)
+        
       } 
   
     return (
@@ -82,7 +70,6 @@ function AddTweet() {
           e.preventDefault()
           if (tweetinput.current === "") return;
           submitTweet()
-          handleClick()
         }}>Tweet</button>
         <textarea rows={3} className="tweetinput span2cols" placeholder="What is happening?!" onChange={(e) => {
             handleChange(e)

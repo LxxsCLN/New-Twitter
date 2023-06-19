@@ -1,8 +1,7 @@
-import { GoogleAuthProvider, getAuth, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "firebase/auth";
+import { getAuth,signOut, } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import React from "react"
 import { useNavigate, } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 function Nav(props) {
@@ -21,13 +20,8 @@ function Nav(props) {
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
 
-  const empty = useRef("")
-
-  function handleClick(){
-    empty.current.value = ""
-  }
-  
 const shadow = !props.back ? "shadow nav" : "nav"
+
     return (
       <div className={shadow}>
           {props.back ? <div onClick={()=>{

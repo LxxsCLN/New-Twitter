@@ -1,31 +1,17 @@
-import { GoogleAuthProvider, getAuth, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "firebase/auth";
+import { getAuth, } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import React from "react"
 import { useNavigate, } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
 
 import {
   getFirestore,
-  collection,
-  addDoc,
-  query,
-  orderBy,
-  limit,
-  onSnapshot,
-  setDoc,
-  updateDoc,
-  deleteDoc,
   doc,
   getDoc,
-  getDocs,
-  serverTimestamp,
 } from 'firebase/firestore';
 
 
 function Tweet(props) {
-
-
 
   const firebaseConfig = {
     apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
@@ -37,7 +23,6 @@ function Tweet(props) {
   };
   initializeApp(firebaseConfig);   
   const auth = getAuth();
-
 
   const [thistwt, setThisTwt] = useState()  
   
@@ -68,26 +53,7 @@ function Tweet(props) {
     loadtwt()      
   }, [])  
 
-  /* const [isVerified, setIsVerified] = useState(false);
-  const [isVerifiedGold, setIsVerifiedGold] = useState(false);
-
-  onAuthStateChanged(auth, authStateObserver);
-
-  async function checkVerified(){
-    const docRef = doc(db, "Users", props.tweet.author);
-    const docSnap = await getDoc(docRef);
-    const data = docSnap.data()
-    setIsVerified(data.isverified) 
-    setIsVerifiedGold(data.isverifiedgold)
-  } 
-
-  function authStateObserver(user){    
-    if (user){      
-      checkVerified()
-    }
-  }   */
-
-  return (
+    return (
     <div onClick={()=>{
       navigate("/viewtweet", true)
       props.setsingletweet(props.id)
