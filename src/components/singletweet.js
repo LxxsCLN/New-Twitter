@@ -27,7 +27,7 @@ function SingleTweet(props) {
 
   const firebaseConfig = {
     apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
-    authDomain: "newtwitterlxxs.firebaseapp.com",
+    authDomain: "newtwitterlxxs.web.app",
     projectId: "newtwitterlxxs",
     storageBucket: "newtwitterlxxs.appspot.com",
     messagingSenderId: "845912882937",
@@ -58,10 +58,14 @@ function SingleTweet(props) {
   // const [isLiked, setIsLiked] = useState(false)
   
   async function addComment(e){
-    e.preventDefault()
     const docRef = doc(getFirestore(), "Tweets", props.id);
-      const docSnap = await getDoc(docRef);
-      const tweet2 = docSnap.data();
+    const docSnap = await getDoc(docRef);
+    const tweet2 = docSnap.data();
+
+    const userRef = doc(getFirestore(), "Users", auth.currentUser.uid);
+    const userSnap = await getDoc(userRef);
+    const userdata = userSnap.data();
+
     try {
       await addDoc(collection(getFirestore(), "Tweets", props.id, "Comments"), {
         author: getAuth().currentUser.uid,
@@ -72,7 +76,9 @@ function SingleTweet(props) {
         likes: 0,
         retweets: 0,
         userretweets: [],
-        userlikes: []
+        userlikes: [],
+        isverified: userdata.isverified,
+        isverifiedgold: userdata.isverifiedgold,
       });
     }
     catch(error) {
@@ -104,10 +110,11 @@ function SingleTweet(props) {
     <div>
     <div className="singletweet">       
              
-        <img className=" tweetuserimg tweetuserimgsingle " alt="" src={props.tweet.profilePicUrl}></img>
+        <img className=" tweetuserimg tweetuserimgsingle " alt="" src={props.authordata.profilePicUrl}></img>
 
         <div className="toptweetdiv">
-        <p className="singletweetname">{props.tweet.name}</p>
+        <div className="singletweetname">{props.authordata.name}   {props.tweet.isverified ? <img alt="" src={process.env.PUBLIC_URL + "verified.svg"} className="smalllogos verifiedlogo"></img> : null}
+        {props.tweet.isverifiedgold ? <img alt="" src={process.env.PUBLIC_URL + "premiumverified.svg"} className="smalllogos verifiedlogo"></img> : null}</div>
         {currentUser === props.tweet.author ? <div onClick={(e)=>{
         e.preventDefault()
         props.deleteTweet(props.id)
@@ -115,7 +122,7 @@ function SingleTweet(props) {
         }} ><img className="smalllogos" alt="" src={process.env.PUBLIC_URL + "delete.svg"}></img></div> : null}
         
         </div>
-        <p className="timedif">@{props.tweet.name}</p>
+        <p className="timedif">@{props.authordata.at}</p>
         <p className="singletweettext spantwocolumn">{props.tweet.tweet}</p>
         <p className="finaldate spantwocolumn">{finaldate}</p>
         
@@ -157,8 +164,10 @@ function SingleTweet(props) {
         <img className=" tweetuserimg tweetuserimgsingle " alt="" src={user.photoURL}></img>
           <input ref={empty} onChange={handleChange} className="commentinput" placeholder="Tweet your reply!"></input>
           <button className="replybutton" onClick={(e)=>{
-            handleClick(e)
-            addComment(e)
+            e.preventDefault()
+            if (tweetinput.current === "") return
+            handleClick()
+            addComment()
           } } >Reply</button>
         </form>
 

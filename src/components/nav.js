@@ -8,7 +8,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 function Nav(props) {
   const firebaseConfig = {
     apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
-    authDomain: "newtwitterlxxs.firebaseapp.com",
+    authDomain: "newtwitterlxxs.web.app",
     projectId: "newtwitterlxxs",
     storageBucket: "newtwitterlxxs.appspot.com",
     messagingSenderId: "845912882937",
@@ -27,9 +27,9 @@ function Nav(props) {
     empty.current.value = ""
   }
   
-
+const shadow = !props.back ? "shadow nav" : "nav"
     return (
-      <div className="nav">
+      <div className={shadow}>
           {props.back ? <div onClick={()=>{
             navigate("/home", true)
           }} className="backsvgdiv"><img  className="backsvg" alt="" src={process.env.PUBLIC_URL + "back.svg"}></img></div>  : <img referrerPolicy="no-referrer" src={user ? user.photoURL : process.env.PUBLIC_URL + "white.png"} alt="" className="userlogo"></img>}

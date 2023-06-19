@@ -28,7 +28,7 @@ function Comment(props) {
 
   const firebaseConfig = {
     apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
-    authDomain: "newtwitterlxxs.firebaseapp.com",
+    authDomain: "newtwitterlxxs.web.app",
     projectId: "newtwitterlxxs",
     storageBucket: "newtwitterlxxs.appspot.com",
     messagingSenderId: "845912882937",
@@ -85,6 +85,8 @@ function Comment(props) {
       <div className="toptweetdiv">
         <div className="nametimetweet">
         <h4>{props.tweet.name}</h4>
+        {props.tweet.isverified ? <img alt="" src={process.env.PUBLIC_URL + "verified.svg"} className="smalllogos verifiedlogo"></img> : null}
+        {props.tweet.isverifiedgold ? <img alt="" src={process.env.PUBLIC_URL + "premiumverified.svg"} className="smalllogos verifiedlogo"></img> : null}
         <p className="timedif">@{props.tweet.name}</p> ·
         <p className="timedif">{secdif > 86400 ? Math.floor(secdif/86400)+"d" : secdif > 3600 ? Math.floor(secdif/3600)+"h" : secdif > 60 ? Math.floor(secdif/60)+"m" : secdif+"s"}</p>
         </div>

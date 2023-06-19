@@ -43,6 +43,11 @@ function AddTweet() {
 
     async function submitTweet(){
         try {
+
+          const docRef = doc(getFirestore(), "Users", getAuth().currentUser.uid);
+          const docSnap = await getDoc(docRef);
+          const authordata = docSnap.data()
+
           await addDoc(collection(getFirestore(), "Tweets"), {
             author: getAuth().currentUser.uid,
             tweet: tweetinput.current,
@@ -54,6 +59,8 @@ function AddTweet() {
             comments: 0,
             userlikes: [],
             userretweets: [],
+            isverified: authordata.isverified,
+            isverifiedgold: authordata.isverifiedgold,
           });
         }
         catch(error) {
@@ -66,21 +73,25 @@ function AddTweet() {
     return (
       <div>
         <Nav back={true} />
+
+
         <form className="writetweet">
-        <input className="tweetinput" placeholder="What is happening?!" onChange={(e) => {
-            handleChange(e)
-        }} ref={empty}></input>
-
-
-        <button className="submittweet" onClick={(e) => {
+        <img className=" tweetuserimg tweetuserimgsingle span3rows" alt="" src={getAuth().currentUser.photoURL}></img>
+        <div className="everyone">Everyone <img alt="" src={process.env.PUBLIC_URL + "bottomarrow.svg"} className="smalllogos"></img></div>
+        <button className="submittweet replybutton" onClick={(e) => {
           e.preventDefault()
           if (tweetinput.current === "") return;
           submitTweet()
           handleClick()
-        } }>Tweet</button>
-
-        
+        }}>Tweet</button>
+        <textarea rows={3} className="tweetinput span2cols" placeholder="What is happening?!" onChange={(e) => {
+            handleChange(e)
+        }} ref={empty}></textarea>        
+        <div className="everyonecanreply span3cols"><img alt="" src={process.env.PUBLIC_URL + "world.svg"} className="smalllogos"></img>Everyone can reply</div>
       </form>  
+
+      
+
       </div>
     )
   }

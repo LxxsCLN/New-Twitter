@@ -28,7 +28,7 @@ import {
 function Home(props) {
   const firebaseConfig = {
     apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
-    authDomain: "newtwitterlxxs.firebaseapp.com",
+    authDomain: "newtwitterlxxs.web.app",
     projectId: "newtwitterlxxs",
     storageBucket: "newtwitterlxxs.appspot.com",
     messagingSenderId: "845912882937",
@@ -95,24 +95,29 @@ function Home(props) {
     setIsLiked(!isLiked)
   }
 
-   
+    const [tweetsarray, setTweetsArray] = useState([]);
 
-  const [tweetsarray, setTweetsArray] = useState([]);
-
+    
 
 useEffect(()=>{
   const loadTweets = async () => {
+       
     let twarr = []
-    const tweetQuery = await getDocs(query(collection(getFirestore(), "Tweets"), orderBy("timestamp", "desc"), limit(20)))
-    tweetQuery.forEach((doc) => {
-      const data = doc.data()      
-      twarr.push(<Tweet key={uniqid()} tweet={data} id={doc.id} setsingletweet={props.setsingletweet} likeTweet={likeTweet} deleteTweet={deleteTweet} retweet={retweet} />)
+    const tweetQuery = await getDocs(query(collection(getFirestore(), "Tweets"), orderBy("timestamp", "desc"), limit(40)))
+    tweetQuery.forEach(async (doc2) => {
+
+      const data2 = doc2.data()   
+
+      const author = doc(getFirestore(), "Users", data2.author); 
+      const docSnap = await getDoc(author);
+      const authordata = docSnap.data() 
+
+      twarr.push(<Tweet key={uniqid()} authordata={authordata} tweet={data2} id={doc2.id} setsingletweet={props.setsingletweet} likeTweet={likeTweet} deleteTweet={deleteTweet} retweet={retweet} />)
+      setTweetsArray(twarr)
     });
-    setTweetsArray(twarr)
   }
   loadTweets()
 }, [isLiked])
-
 
   return (
     

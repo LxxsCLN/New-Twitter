@@ -163,30 +163,30 @@ function ViewTweet(props) {
   useEffect(()=>{
     
     const loadTweets = async () => {
-      const querySnapshot = await getDocs(collection(getFirestore(), "Tweets"), orderBy('timestamp', 'desc'), limit(20));      
-      let thistwt = "";      
-      querySnapshot.forEach( async(doc) => {
-        const data = doc.data()
-        if (doc.id === props.thisTweet){
-          thistwt = <SingleTweet retweet={retweet} likeTweet={likeTweet} key={uniqid()} tweet={data} id={doc.id} handleChange={handleChange} isLiked={isLiked} setIsLiked={setIsLiked} deleteTweet={deleteTweet} />
-          loadComments(doc.id)
-        }
-      });      
-      setTweet(thistwt)      
+
+      const singletwt = doc(getFirestore(), "Tweets", props.thisTweet); 
+      const singletwtSnap = await getDoc(singletwt);
+      const singletwtdata = singletwtSnap.data() 
+
+      const author = doc(getFirestore(), "Users", singletwtdata.author); 
+      const docSnap = await getDoc(author);
+      const authordata = docSnap.data() 
+
+      let thistwt = <SingleTweet retweet={retweet} authordata={authordata} likeTweet={likeTweet} key={uniqid()} tweet={singletwtdata} id={singletwtSnap.id} handleChange={handleChange} isLiked={isLiked} setIsLiked={setIsLiked} deleteTweet={deleteTweet} />
+      setTweet(thistwt) 
+      loadComments(singletwtSnap.id)        
     }
 
     const loadComments = async (docid) => {
       let comments1 = []
-      const queryComments = await getDocs(query(collection(getFirestore(), "Tweets", docid, "Comments"), orderBy('timestamp', 'desc'), limit(10)));
+      const queryComments = await getDocs(query(collection(getFirestore(), "Tweets", docid, "Comments"), orderBy('timestamp', 'desc'), limit(16)));
       queryComments.forEach((doc2) => {
        const data2 = doc2.data()
        comments1.push(<Comment retweetComment={retweetComment} tweet={data2} key={uniqid()} id={doc2.id} docid={docid} likeComment={likeComment} deleteComment={deleteComment} />)
      }) 
      setComms(comments1)
     }
-
-    loadTweets() 
-
+    loadTweets()
   }, [isLiked])
 
    

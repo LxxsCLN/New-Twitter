@@ -24,7 +24,7 @@ import {
 function Login() {
   const firebaseConfig = {
     apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
-    authDomain: "newtwitterlxxs.firebaseapp.com",
+    authDomain: "newtwitterlxxs.web.app",
     projectId: "newtwitterlxxs",
     storageBucket: "newtwitterlxxs.appspot.com",
     messagingSenderId: "845912882937",
@@ -41,7 +41,6 @@ function Login() {
   onAuthStateChanged(auth, authStateObserver);
 
   async function addUser(){
-    navigate("/home", true)
 
     const docRef = doc(db, "Users", auth.currentUser.uid);
     const docSnap = await getDoc(docRef);
@@ -57,15 +56,17 @@ function Login() {
         profilePicUrl: auth.currentUser.photoURL || null,
         timestamp: serverTimestamp(),
         isverified: false,
+        isverifiedgold: false,
+        at: auth.currentUser.displayName,
       });
     }
   } 
 
   function authStateObserver(user){
     
-    if (user){
-      addUser()
+    if (user){      
       navigate("/home", true)
+      addUser()
     }
   }  
     

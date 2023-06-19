@@ -38,6 +38,10 @@
   width: 25px;
 }
 
+.Home{
+  margin: 0 0 90px 0;
+}
+
 .userlogo{
   height: 32px;
   width: 32px;
@@ -62,6 +66,7 @@ h1{
   flex-direction: column;
   gap: 20px;
   align-items: center;
+  margin-top: 20px;
 }
 
 .likedtweetbutton{
@@ -73,7 +78,7 @@ h1{
 }
 
 .nav{
-  border-bottom: 1px solid rgb(239, 243, 244);
+  
   position: sticky;
   top: 0px;
   background-color: white;
@@ -83,6 +88,10 @@ h1{
   justify-content: space-between;
   align-items: center;
   height: 52px;
+}
+
+.shadow{
+  box-shadow: 0px 3px 4px -4px rgba(0, 0, 0, .5);
 }
 
 .scale-up-center>img {
@@ -122,7 +131,10 @@ h1{
 }
 
 
-
+.verifiedlogo{
+  width: 16px;
+  height: 16px;
+}
 
 
 .backsvgdiv{
@@ -187,6 +199,67 @@ h1{
   max-width: 230px;
 }
 
+.writetweet{
+  display: grid;
+  grid-template-columns: .8fr 5fr 1.6fr;
+  grid-template-rows: auto auto auto auto;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgb(239, 243, 244);
+}
+
+.tweetinput{
+  border: none;
+  font-size: 20px;
+  text-justify: center;
+  border: none;
+}
+
+.tweetinput:focus{
+  outline: none;
+}
+
+.span3rows{
+  grid-row: span 3;
+}
+
+.span2cols{
+  grid-column: span 2;
+}
+
+.span3cols{
+  grid-column: span 2;
+}
+
+.everyone{
+  height: 24px;
+  display: flex;
+  flex-direction: row;
+  border: 1px solid rgb(207, 217, 222);
+  border-bottom-left-radius: 9999px;
+  border-bottom-right-radius: 9999px;
+  border-top-left-radius: 9999px;
+  border-top-right-radius: 9999px;
+  max-width: 108px;
+  font-size: 14px;
+  font-weight: 700;
+  justify-content: center;
+  align-items: center;
+  font-family: "ChirpBold";
+  gap: 5px;
+}
+
+.everyonecanreply{
+  height: 24px;
+  display: flex;
+  flex-direction: row;
+  font-size: 14px;
+  font-weight: 700;
+  align-items: center;
+  font-family: "ChirpBold";
+  gap: 5px;
+}
+
 .lowopacity{
   opacity: .4;
 }
@@ -201,9 +274,14 @@ h1{
   font-weight: 700;
   font-size: 15px;
   height: 34px;
-  min-width: 75px;
+  width: 75px;
   border: none;
   border-radius: 17px;
+  font-family: "ChirpBold";
+}
+
+h4{
+  font-family: "ChirpBold";
 }
 
 .toptweetdiv{
@@ -289,6 +367,10 @@ h1{
 .singletweetname{
   font-size: 15px;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-family: "ChirpBold";
 }
 
 .tweetuserimgsingle{

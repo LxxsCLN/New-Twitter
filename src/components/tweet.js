@@ -25,9 +25,11 @@ import {
 
 function Tweet(props) {
 
+
+
   const firebaseConfig = {
     apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
-    authDomain: "newtwitterlxxs.firebaseapp.com",
+    authDomain: "newtwitterlxxs.web.app",
     projectId: "newtwitterlxxs",
     storageBucket: "newtwitterlxxs.appspot.com",
     messagingSenderId: "845912882937",
@@ -66,10 +68,24 @@ function Tweet(props) {
     loadtwt()      
   }, [])  
 
+  /* const [isVerified, setIsVerified] = useState(false);
+  const [isVerifiedGold, setIsVerifiedGold] = useState(false);
 
+  onAuthStateChanged(auth, authStateObserver);
 
+  async function checkVerified(){
+    const docRef = doc(db, "Users", props.tweet.author);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data()
+    setIsVerified(data.isverified) 
+    setIsVerifiedGold(data.isverifiedgold)
+  } 
 
-
+  function authStateObserver(user){    
+    if (user){      
+      checkVerified()
+    }
+  }   */
 
   return (
     <div onClick={()=>{
@@ -77,12 +93,14 @@ function Tweet(props) {
       props.setsingletweet(props.id)
     }} className="tweet">  
       
-      <img referrerPolicy="no-referrer" className="tweetuserimg" alt="" src={props.tweet.profilePicUrl}></img>
-
+      <img referrerPolicy="no-referrer" className="tweetuserimg" alt="" src={props.authordata.profilePicUrl}></img>
+      
       <div className="toptweetdiv">
-        <div className="nametimetweet">
-        <h4>{props.tweet.name}</h4>
-        <p className="timedif">@{props.tweet.name}</p> ·
+        <div className="nametimetweet">        
+        <h4>{props.authordata.name}</h4>
+        {props.tweet.isverified ? <img alt="" src={process.env.PUBLIC_URL + "verified.svg"} className="smalllogos verifiedlogo"></img> : null}
+        {props.tweet.isverifiedgold ? <img alt="" src={process.env.PUBLIC_URL + "premiumverified.svg"} className="smalllogos verifiedlogo"></img> : null}
+        <p className="timedif">@{props.authordata.at}</p> ·
         <p className="timedif">{secdif > (358 * 86400) ? date3 : secdif > 86400 ? date2 : secdif > 3600 ? Math.floor(secdif/3600)+"h" : secdif > 60 ? Math.floor(secdif/60)+"m" : secdif+"s"}</p>
         </div>
 

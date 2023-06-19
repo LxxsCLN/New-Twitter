@@ -31,7 +31,7 @@ import {
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { getPerformance } from 'firebase/performance'; 
 
-import React, { useState, useEffect, } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, HashRouter, Link } from "react-router-dom";
 import Login from "./components/login";
 import Home from "./components/home";
@@ -42,12 +42,34 @@ import AddTweet from './components/addTweet';
 
 
 function App() {
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
+    authDomain: "newtwitterlxxs.web.app",
+    projectId: "newtwitterlxxs",
+    storageBucket: "newtwitterlxxs.appspot.com",
+    messagingSenderId: "845912882937",
+    appId: "1:845912882937:web:d1d5fe3a1fe71bc14c6c28"
+  };
+
+
+  const app = initializeApp(firebaseConfig);  
+  const provider = new GoogleAuthProvider();  
+  const auth = getAuth();
+  const db = getFirestore();
+  
+
+  
   
   const [thisTweet, setThisTweet] = useState()
 
-function setsingletweet(docid){
-  setThisTweet(docid)
-}
+  function setsingletweet(docid){
+    setThisTweet(docid)
+  }
+
+  
+
+
 
   return (
     <HashRouter>
