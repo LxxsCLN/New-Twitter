@@ -45,7 +45,7 @@ function App() {
       <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/home" element={<Home setsingletweet={setsingletweet} />} />
-      <Route path="/viewtweet" element={<ViewTweet thisTweet={thisTweet} />} />
+      <Route path="/viewtweet" element={<ViewTweet thisTweet={thisTweet} setsingletweet={setsingletweet} />} />
       <Route path='/addtweet' element={<AddTweet />} />
       </Routes>
     </HashRouter>

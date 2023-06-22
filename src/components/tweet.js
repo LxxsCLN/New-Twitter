@@ -8,6 +8,7 @@ import {
   getFirestore,
   doc,
   getDoc,
+  updateDoc
 } from 'firebase/firestore';
 
 
@@ -21,14 +22,13 @@ function Tweet(props) {
     messagingSenderId: "845912882937",
     appId: "1:845912882937:web:d1d5fe3a1fe71bc14c6c28"
   };
+
   initializeApp(firebaseConfig);   
   const auth = getAuth();
 
-  const [thistwt, setThisTwt] = useState()  
+  const [thistwt, setThisTwt] = useState(props.tweet)  
   
   const currentUser = auth.currentUser.uid;
-  const doesLike = props.tweet.userlikes.includes(auth.currentUser.uid)
-  const doesRetweet = props.tweet.userretweets.includes(auth.currentUser.uid)
   
   const navigate = useNavigate();
   const db = getFirestore();  
@@ -38,20 +38,128 @@ function Tweet(props) {
   const originaldateutc = props.tweet.timestamp.toDate().toUTCString()
   const currentseconds = Date.parse(currentdateutc);
   const originalseconds = Date.parse(originaldateutc);
-  const secdif = (currentseconds-originalseconds)/1000  
+  const secdif = (currentseconds - originalseconds)/1000  
 
   const date2 = originaldateutc.slice(4, 11);   
   const date3 = originaldateutc.slice(4, 11) + "," + originaldateutc.slice(11, 16); 
 
+
+  const [isLiked, setIsLiked] = useState(false)
+  const [doesLike, setDoesLike] = useState(props.tweet.userlikes.includes(getAuth().currentUser.uid))
+  const [doesRetweet, setDoesRetweet] = useState(props.tweet.userretweets.includes(auth.currentUser.uid))
+  
   useEffect(()=>{
     const loadtwt = async() => {
       const docRef = doc(db, "Tweets", props.id);
       const docSnap = await getDoc(docRef);
       const tweet = docSnap.data();
       setThisTwt(tweet) 
+      setDoesLike(tweet.userlikes.includes(getAuth().currentUser.uid))
+      setDoesRetweet(tweet.userretweets.includes(getAuth().currentUser.uid))
     }
     loadtwt()      
-  }, [])  
+  }, [isLiked])  
+
+  /* function onMediaFileSelected(event) {
+  event.preventDefault();
+  var file = event.target.files[0];
+
+  // Clear the selection in the file picker input.
+  imageFormElement.reset();
+
+  // Check if the file is an image.
+  if (!file.type.match('image.*')) {
+    var data = {
+      message: 'You can only share images',
+      timeout: 2000,
+    };
+    signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
+    return;
+  }
+  // Check if the user is signed-in
+  if (checkSignedInWithMessage()) {
+    saveImageMessage(file);
+  }
+}
+
+async function saveImageMessage(file) {
+  try {
+    // 1 - We add a message with a loading icon that will get updated with the shared image.
+    const messageRef = await addDoc(collection(getFirestore(), 'messages'), {
+      name: getUserName(),
+      imageUrl: LOADING_IMAGE_URL,
+      profilePicUrl: getProfilePicUrl(),
+      timestamp: serverTimestamp()
+    });
+
+    // 2 - Upload the image to Cloud Storage.
+    const filePath = `${getAuth().currentUser.uid}/${messageRef.id}/${file.name}`;
+    const newImageRef = ref(getStorage(), filePath);
+    const fileSnapshot = await uploadBytesResumable(newImageRef, file);
+    
+    // 3 - Generate a public URL for the file.
+    const publicImageUrl = await getDownloadURL(newImageRef);
+
+    // 4 - Update the chat message placeholder with the image's URL.
+    await updateDoc(messageRef,{
+      imageUrl: publicImageUrl,
+      storageUri: fileSnapshot.metadata.fullPath
+    });
+  } catch (error) {
+    console.error('There was an error uploading a file to Cloud Storage:', error);
+  }
+}
+
+*/
+
+  
+  async function likeTweetHere(id, likes, usrlikes){
+
+    const doesLike = usrlikes.includes(getAuth().currentUser.uid)
+    const newuserlikes = [...usrlikes] 
+    const currTWT = doc(getFirestore(), "Tweets", id);
+    let newlikes = likes;
+
+    if (!doesLike){
+      newlikes += 1;
+      newuserlikes.push(getAuth().currentUser.uid)  
+    } else {
+      let index = usrlikes.indexOf(getAuth().currentUser.uid)
+      newuserlikes.splice(index, 1); 
+      newlikes -= 1; 
+    }
+    await updateDoc(currTWT, {
+      likes: newlikes,
+      userlikes: newuserlikes,
+      });
+    setIsLiked(!isLiked)
+  }
+
+  async function retweetHere(id, retweets, usrretweets){
+
+    const doesRetweet = usrretweets.includes(getAuth().currentUser.uid)
+    const newuserretweets = [...usrretweets] 
+    const currTWT = doc(getFirestore(), "Tweets", id);
+    let newretweets = retweets;
+
+    if (!doesRetweet){
+      newretweets += 1;
+      newuserretweets.push(getAuth().currentUser.uid)  
+    } else {
+      let index = usrretweets.indexOf(getAuth().currentUser.uid)
+      newuserretweets.splice(index, 1); 
+      newretweets -= 1; 
+    }
+    await updateDoc(currTWT, {
+      retweets: newretweets,
+      userretweets: newuserretweets,
+      });
+    setIsLiked(!isLiked)
+    
+  }
+
+  const classbutton = !doesLike ? "smalllogosdiv" : "smalllogosdiv scale-up-center";
+  const classbutton2 = !doesRetweet ? "smalllogosdiv" : "smalllogosdiv scale-up-center";
 
     return (
     <div onClick={()=>{
@@ -59,21 +167,22 @@ function Tweet(props) {
       props.setsingletweet(props.id)
     }} className="tweet">  
       
-      <img referrerPolicy="no-referrer" className="tweetuserimg" alt="" src={props.authordata.profilePicUrl}></img>
+      <img referrerPolicy="no-referrer" className="tweetuserimg" alt="" src={props.tweet.profilePicUrl}></img>
       
       <div className="toptweetdiv">
         <div className="nametimetweet">        
-        <h4>{props.authordata.name}</h4>
+        <h4>{props.tweet.name}</h4>
         {props.tweet.isverified ? <img alt="" src={process.env.PUBLIC_URL + "verified.svg"} className="smalllogos verifiedlogo"></img> : null}
         {props.tweet.isverifiedgold ? <img alt="" src={process.env.PUBLIC_URL + "premiumverified.svg"} className="smalllogos verifiedlogo"></img> : null}
-        <p className="timedif">@{props.authordata.at}</p> ·
+        <p className="timedif">@{props.tweet.at}</p> ·
         <p className="timedif">{secdif > (358 * 86400) ? date3 : secdif > 86400 ? date2 : secdif > 3600 ? Math.floor(secdif/3600)+"h" : secdif > 60 ? Math.floor(secdif/60)+"m" : secdif+"s"}</p>
         </div>
 
-          {currentUser === props.tweet.author ? <div className="smalllogos" onClick={(e)=>{
+          {currentUser === props.tweet.author ? <div className="smalllogos" onClick={async(e)=>{
           e.stopPropagation()
           e.preventDefault()
-          props.deleteTweet(props.id)}} ><img className="smalllogos" alt="" src={process.env.PUBLIC_URL + "delete.svg"}></img></div> : null}
+          await props.deleteTweet(props.id);
+          }} ><img className="smalllogos" alt="" src={process.env.PUBLIC_URL + "delete.svg"}></img></div> : null}
 
       </div>
 
@@ -83,33 +192,30 @@ function Tweet(props) {
         <div className="smalllogosdiv"> <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "comment.svg"}></img><p className="font13">{props.tweet.comments}</p></div>
 
         {doesRetweet ? 
-          <div className="smalllogosdiv" onClick={(e)=>{
+          <div className={classbutton2} onClick={(e)=>{
             e.stopPropagation()
             
-            props.retweet(props.id, props.tweet.retweets, props.tweet.userretweets)          
+            retweetHere(props.id, thistwt.retweets, thistwt.userretweets)          
             }}>
           <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "retweeted.svg"}></img><p className="font13">{thistwt ? thistwt.retweets : props.tweet.retweets}</p>
           </div> :          
-          <div className="smalllogosdiv" onClick={(e)=>{
+          <div className={classbutton2} onClick={(e)=>{
             e.stopPropagation()
-            props.retweet(props.id, props.tweet.retweets, props.tweet.userretweets)          
+            retweetHere(props.id, thistwt.retweets, thistwt.userretweets)          
             }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "notretweeted.svg"}></img><p className="font13">
             {thistwt ? thistwt.retweets : props.tweet.retweets}</p>
           </div>
         }
 
-
-        {doesLike ?<div  className="smalllogosdiv" onClick={(e)=>{
+        {doesLike ?<div  className={classbutton} onClick={(e)=>{
           e.stopPropagation()          
-          props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)          
-          }}><img alt="" className="smalllogos " src={process.env.PUBLIC_URL + "liked.svg"}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
-        </div> : <div className="smalllogosdiv" onClick={(e)=>{
+          likeTweetHere(props.id, thistwt.likes, thistwt.userlikes)          
+          }}><img alt="" className="smalllogos " src={process.env.PUBLIC_URL + "liked.svg"}></img><p className="font13">{thistwt ? thistwt.likes : thistwt.likes}</p>
+        </div> : <div className={classbutton} onClick={(e)=>{
           e.stopPropagation()
-          props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)          
+          likeTweetHere(props.id, thistwt.likes, thistwt.userlikes)          
           }}><img alt="" className="smalllogos " src={process.env.PUBLIC_URL + "notliked.svg"}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
         </div>}
-        
-        
 
         <p></p>
       </div>
@@ -118,4 +224,5 @@ function Tweet(props) {
   );
 }
 
-export default Tweet;
+export default React.memo(Tweet);;
+

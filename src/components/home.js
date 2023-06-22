@@ -12,7 +12,6 @@ import {
   collection,
   query,
   limit,
-  updateDoc,
   deleteDoc,
   doc,
   getDoc,
@@ -35,61 +34,21 @@ function Home(props) {
   const provider = new GoogleAuthProvider();  
   const auth = getAuth();
   const db = getFirestore();
-
-  
-  const [isLiked, setIsLiked] = useState(false)
-
+  const [tweetsarray, setTweetsArray] = useState();
 
   async function deleteTweet(id){
+
+    const orgtweet = doc(getFirestore(), "Tweets", id); 
+    const tweetSnap = await getDoc(orgtweet);
+    const tweetdata = tweetSnap.data() 
+    if (tweetdata.comments > 0){
+      tweetdata.commentsarray.forEach((com) => {
+        deleteTweet(com) 
+      })  
+    }
     await deleteDoc(doc(db, "Tweets", id));
-    setIsLiked(!isLiked)
-  }  
- 
-  async function likeTweet(id, likes, usrlikes){
-
-    const doesLike = usrlikes.includes(getAuth().currentUser.uid)
-    const newuserlikes = [...usrlikes] 
-    const currTWT = doc(getFirestore(), "Tweets", id);
-    let newlikes = likes;
-
-    if (!doesLike){
-      newlikes += 1;
-      newuserlikes.push(getAuth().currentUser.uid)  
-    } else {
-      let index = usrlikes.indexOf(getAuth().currentUser.uid)
-      newuserlikes.splice(index, 1); 
-      newlikes -= 1; 
-    }
-    await updateDoc(currTWT, {
-      likes: newlikes,
-      userlikes: newuserlikes,
-      });
-      setIsLiked(!isLiked)
-  }
-
-  async function retweet(id, retweets, usrretweets){
-
-    const doesRetweet = usrretweets.includes(getAuth().currentUser.uid)
-    const newuserretweets = [...usrretweets] 
-    const currTWT = doc(getFirestore(), "Tweets", id);
-    let newretweets = retweets;
-
-    if (!doesRetweet){
-      newretweets += 1;
-      newuserretweets.push(getAuth().currentUser.uid)  
-    } else {
-      let index = usrretweets.indexOf(getAuth().currentUser.uid)
-      newuserretweets.splice(index, 1); 
-      newretweets -= 1; 
-    }
-    await updateDoc(currTWT, {
-      retweets: newretweets,
-      userretweets: newuserretweets,
-      });
-    setIsLiked(!isLiked)
-  }
-
-  const [tweetsarray, setTweetsArray] = useState();
+    setTweetsArray(tweetsarray)
+  }     
 
 
 useEffect(()=>{
@@ -106,30 +65,36 @@ useEffect(()=>{
     }
        
     let twarr = []
-    const tweetQuery = await getDocs(query(collection(getFirestore(), "Tweets"), limit(40)))
+    const tweetQuery = await getDocs(query(collection(getFirestore(), "Tweets"), limit(25)))
+    if(tweetQuery._snapshot.docs.sortedSet.root.size === 0){      
+      setTweetsArray([])      
+    } else {
+        tweetQuery.forEach(async (doc2) => {
+        const data2 = doc2.data()  
+        const author = doc(getFirestore(), "Users", data2.author); 
+        const docSnap = await getDoc(author);
+        const authordata = docSnap.data() 
 
-    tweetQuery.forEach(async (doc2) => {
-
-      const data2 = doc2.data()  
-      const author = doc(getFirestore(), "Users", data2.author); 
-      const docSnap = await getDoc(author);
-      const authordata = docSnap.data() 
-
-      twarr.push(<Tweet key={uniqid()} authordata={authordata} tweet={data2} id={doc2.id} setsingletweet={props.setsingletweet} likeTweet={likeTweet} deleteTweet={deleteTweet} retweet={retweet} />)
-      let newarr = twarr.sort(compare)
-    setTweetsArray(newarr)
-    }); 
+        if (!data2.iscomment) {
+          twarr.push(<Tweet key={uniqid()} authordata={authordata} tweet={data2} id={doc2.id} setsingletweet={props.setsingletweet} deleteTweet={deleteTweet} />)
+          if (twarr.length > 1){
+            let newarr = twarr.sort(compare)
+            setTweetsArray(newarr)
+          } else{
+            setTweetsArray(twarr)
+          }          
+        }      
+      })
+    }    
   }
-
   loadTweets() 
-}, [isLiked])
+}, [])
 
   return (
     
     <div className="Home">
       <Nav />
       {tweetsarray}
-
       <div onClick={()=>{
         navigate("/addtweet", true)
       } } className="addtweetbutton"><img alt="" src={process.env.PUBLIC_URL + "addtweet.svg"}></img></div>

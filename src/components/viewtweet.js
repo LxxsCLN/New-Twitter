@@ -1,4 +1,3 @@
-import { getAuth} from "firebase/auth";
 import React from "react"
 import { useEffect, useState } from "react";
 import Nav from "./nav";
@@ -23,102 +22,6 @@ import {
 function ViewTweet(props) {
   const [isLiked, setIsLiked] = useState(false)
   const db = getFirestore();
-
-  async function likeTweet(id, likes, usrlikes){
-
-    const doesLike = usrlikes.includes(getAuth().currentUser.uid)
-    const newuserlikes = [...usrlikes] 
-    const currTWT = doc(getFirestore(), "Tweets", id);
-    let newlikes = likes;
-
-    if (!doesLike){
-      newlikes += 1;
-      newuserlikes.push(getAuth().currentUser.uid)  
-    } else {
-      let index = usrlikes.indexOf(getAuth().currentUser.uid)
-      newuserlikes.splice(index, 1); 
-      newlikes -= 1; 
-    }
-    await updateDoc(currTWT, {
-      likes: newlikes,
-      userlikes: newuserlikes,
-      });
-    setIsLiked(!isLiked)
-  }
-  
-
-  async function retweet(id, retweets, usrretweets){
-
-    const doesLike = usrretweets.includes(getAuth().currentUser.uid)
-    const newuserretweets = [...usrretweets] 
-    const currTWT = doc(getFirestore(), "Tweets", id);
-    let newretweets = retweets;
-
-    if (!doesLike){
-      newretweets += 1;
-      newuserretweets.push(getAuth().currentUser.uid)  
-    } else {
-      let index = usrretweets.indexOf(getAuth().currentUser.uid)
-      newuserretweets.splice(index, 1); 
-      newretweets -= 1; 
-    }
-    await updateDoc(currTWT, {
-      retweets: newretweets,
-      userretweets: newuserretweets,
-      });
-    setIsLiked(!isLiked)
-  }
-
-
-  async function likeComment(docid, id, likes, usrlikes){
-
-    const doesLike = usrlikes.includes(getAuth().currentUser.uid)
-    const newuserlikes = [...usrlikes] 
-    const currTWT = doc(getFirestore(), "Tweets", docid, "Comments", id);
-    let newlikes = likes;
-
-    if (!doesLike){
-      newlikes += 1;
-      newuserlikes.push(getAuth().currentUser.uid)  
-    } else {
-      let index = usrlikes.indexOf(getAuth().currentUser.uid)
-      newuserlikes.splice(index, 1); 
-      newlikes -= 1; 
-    }
-    await updateDoc(currTWT, {
-      likes: newlikes,
-      userlikes: newuserlikes,
-      });
-    setIsLiked(!isLiked)
-  }
-
-  async function retweetComment(docid, id, retweets, usrretweets){
-
-    const doesRetweet = usrretweets.includes(getAuth().currentUser.uid)
-    const newuserretweets = [...usrretweets] 
-    const currTWT = doc(getFirestore(), "Tweets", docid, "Comments", id);
-    let newretweets = retweets;
-
-    if (!doesRetweet){
-      newretweets += 1;
-      newuserretweets.push(getAuth().currentUser.uid)  
-    } else {
-      let index = usrretweets.indexOf(getAuth().currentUser.uid)
-      newuserretweets.splice(index, 1); 
-      newretweets -= 1; 
-    }
-    await updateDoc(currTWT, {
-      retweets: newretweets,
-      userretweets: newuserretweets,
-      });
-    setIsLiked(!isLiked)
-  }
-
-  async function deleteTweet(id){
-    await deleteDoc(doc(db, "Tweets", id));
-    setIsLiked(!isLiked)
-  }
- 
   const [tweet, setTweet] = useState()
   const [comms, setComms] = useState()
 
@@ -126,24 +29,60 @@ function ViewTweet(props) {
     setTweet(event.target.value);
   };
 
+  async function deleteTweet(id){
+    const orgtweet = doc(getFirestore(), "Tweets", id); 
+    const tweetSnap = await getDoc(orgtweet);
+    const tweetdata = tweetSnap.data() 
+    if (tweetdata.comments > 0){
+      tweetdata.commentsarray.forEach((com) => {
+        deleteTweet(com) 
+      })  
+    }
+    await deleteDoc(doc(db, "Tweets", id));
+  }
+
+  async function updateParentTweet(id){
+    const orgtweet = doc(getFirestore(), "Tweets", id); 
+    const tweetSnap = await getDoc(orgtweet);
+    const tweetdata = tweetSnap.data() 
+    if (tweetdata.iscomment){
+      const parentTwt = doc(getFirestore(), "Tweets", tweetdata.parentid);
+      const parentSnap = await getDoc(parentTwt);
+      const parentdata = parentSnap.data() 
+      const newcommentsarray = parentdata.commentsarray.filter(item => item !== id)
+      await updateDoc(parentTwt, {
+        comments: parentdata.comments - 1,
+        commentsarray: newcommentsarray,
+      });
+    }
+    await deleteTweet(id)
+  }
 
   async function deleteComment(docid, id){
     const docRef = doc(getFirestore(), "Tweets", docid);
     const docSnap = await getDoc(docRef);
     const tweet2 = docSnap.data();
-
-    await deleteDoc(doc(db, "Tweets", docid, "Comments", id));
+    const newcomments = tweet2.commentsarray.filter(item => item !== id)
 
     await updateDoc(docRef, {
-      comments: tweet2.comments - 1
+      comments: tweet2.comments - 1,
+      commentsarray: newcomments,
     });
-    
+    await deleteTweet(id)
     setIsLiked(!isLiked)
   }
 
-
-
   useEffect(()=>{
+
+    function compare( a, b ) {
+      if ( a.props.tweet.timestamp.seconds > b.props.tweet.timestamp.seconds ){
+        return -1;
+      }
+      if ( a.props.tweet.timestamp.seconds < b.props.tweet.timestamp.seconds ){
+        return 1;
+      }
+      return 0;
+    }
     
     const loadTweets = async () => {
 
@@ -151,34 +90,43 @@ function ViewTweet(props) {
       const singletwtSnap = await getDoc(singletwt);
       const singletwtdata = singletwtSnap.data() 
 
-      const author = doc(getFirestore(), "Users", singletwtdata.author); 
-      const docSnap = await getDoc(author);
-      const authordata = docSnap.data() 
-
-      let thistwt = <SingleTweet retweet={retweet} authordata={authordata} likeTweet={likeTweet} key={uniqid()} tweet={singletwtdata} id={singletwtSnap.id} handleChange={handleChange} isLiked={isLiked} setIsLiked={setIsLiked} deleteTweet={deleteTweet} />
+      let thistwt = <SingleTweet updateParentTweet={updateParentTweet} key={uniqid()} tweet={singletwtdata} id={singletwtSnap.id} handleChange={handleChange} isLiked={isLiked} setIsLiked={setIsLiked} deleteTweet={deleteTweet} />
       setTweet(thistwt) 
-      loadComments(singletwtSnap.id)        
+      if (singletwtdata.commentsarray.length > 0){
+        loadComments(singletwtSnap.id, singletwtdata) 
+      } else {
+        setComms([])
+      }
+             
     }
 
-    const loadComments = async (docid) => {
+    const loadComments = async (docid, docdata) => {
       let comments1 = []
-      const queryComments = await getDocs(query(collection(getFirestore(), "Tweets", docid, "Comments"), orderBy('timestamp', 'desc'), limit(16)));
-      queryComments.forEach((doc2) => {
-       const data2 = doc2.data()
-       comments1.push(<Comment retweetComment={retweetComment} tweet={data2} key={uniqid()} id={doc2.id} docid={docid} likeComment={likeComment} deleteComment={deleteComment} />)
-     }) 
-     setComms(comments1)
+      let counter = 0;       
+      
+      docdata.commentsarray.forEach(async(elem) => {
+        const singletwt = doc(getFirestore(), "Tweets", elem); 
+        const singletwtSnap = await getDoc(singletwt);
+        const singletwtdata = singletwtSnap.data() 
+        comments1.push(<Comment tweet={singletwtdata} key={uniqid()} id={singletwtSnap.id} docid={docid} deleteComment={deleteComment} setsingletweet={props.setsingletweet} />)        
+        counter++;
+        if (counter >= docdata.commentsarray.length){
+          let newarr = comments1.sort(compare)
+          setComms(newarr)
+        }
+      })
     }
     loadTweets()
-  }, [isLiked])
-
+  }, [isLiked, props.thisTweet])
    
+
+
     return (
                 
       <div className="ViewTweet">
         <Nav back={true} />
         {tweet}
-        {comms}
+        {comms ? comms : null}
       </div>
     );
   }

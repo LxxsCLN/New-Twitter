@@ -8,11 +8,10 @@ import {
   getFirestore,
   doc,
   getDoc,
+  updateDoc
 } from 'firebase/firestore';
 
 function Comment(props) {
-
-  const [thistwt, setThisTwt] = useState()
 
   const firebaseConfig = {
     apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
@@ -28,45 +27,93 @@ function Comment(props) {
   const auth = getAuth();
   const navigate = useNavigate();
 
+
+  const [thistwt, setThisTwt] = useState(props.tweet)
+  const [isLiked, setIsLiked] = useState(false)
+  const [doesLike, setDoesLike] = useState(props.tweet.userlikes.includes(getAuth().currentUser.uid))
+  const [doesRetweet, setDoesRetweet] = useState(props.tweet.userretweets.includes(auth.currentUser.uid))
+
+  
+
+  
   useEffect(()=>{
 
     const loadtwt = async() => {
-      const docRef = doc(getFirestore(), "Tweets", props.docid, "Comments", props.id);
+      const docRef = doc(getFirestore(), "Tweets", props.id);
       const docSnap = await getDoc(docRef);
       const tweet = docSnap.data();
-      setThisTwt(tweet)
+      setThisTwt(tweet) 
+      setDoesLike(tweet.userlikes.includes(getAuth().currentUser.uid))
+      setDoesRetweet(tweet.userretweets.includes(getAuth().currentUser.uid))
     }
     loadtwt()    
-  }, [])
+  }, [isLiked])
+
+  async function likeCommentHere(id, likes, usrlikes){
+
+    const doesLike = usrlikes.includes(getAuth().currentUser.uid)
+    const newuserlikes = [...usrlikes] 
+    const currTWT = doc(getFirestore(), "Tweets", id);
+    let newlikes = likes;
+
+    if (!doesLike){
+      newlikes += 1;
+      newuserlikes.push(getAuth().currentUser.uid)  
+    } else {
+      let index = usrlikes.indexOf(getAuth().currentUser.uid)
+      newuserlikes.splice(index, 1); 
+      newlikes -= 1; 
+    }
+    await updateDoc(currTWT, {
+      likes: newlikes,
+      userlikes: newuserlikes,
+      });
+    setIsLiked(!isLiked)
+  }
+
+  async function retweetCommentHere(id, retweets, usrretweets){
+
+    const doesRetweet = usrretweets.includes(getAuth().currentUser.uid)
+    const newuserretweets = [...usrretweets] 
+    const currTWT = doc(getFirestore(), "Tweets", id);
+    let newretweets = retweets;
+
+    if (!doesRetweet){
+      newretweets += 1;
+      newuserretweets.push(getAuth().currentUser.uid)  
+    } else {
+      let index = usrretweets.indexOf(getAuth().currentUser.uid)
+      newuserretweets.splice(index, 1); 
+      newretweets -= 1; 
+    }
+    await updateDoc(currTWT, {
+      retweets: newretweets,
+      userretweets: newuserretweets,
+      });
+    setIsLiked(!isLiked)
+  }
   
   const currentUser = getAuth().currentUser.uid;
-  const doesLike = props.tweet.userlikes.includes(getAuth().currentUser.uid)
-  const likeClass = doesLike ? "likedtweetbutton" : "notlikedtweetbutton";
-  const doesRetweet = props.tweet.userretweets.includes(getAuth().currentUser.uid)
-  const retweetClass = doesRetweet ? "retweetedtweetbutton" : "notretweetedtweetbutton"; 
-
-  const date = props.tweet.timestamp.toDate().toDateString()
-  const date2 = date.slice(4, 10) + "," + date.slice(10);    
-
-  const hoursarray = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-  const hoursindex = props.tweet.timestamp.toDate().getHours()
-  const minutes = props.tweet.timestamp.toDate().getMinutes()
-  const realhour = hoursarray[hoursindex]
-  const ampm = hoursindex < 12 ? " a.m. · " : " p.m. · "
-  const finaldate = realhour + ":" + minutes + ampm + date2;
 
   const currentdate = new Date()
   const currentdateutc = currentdate.toUTCString()
   const originaldateutc = props.tweet.timestamp.toDate().toUTCString()
   const currentseconds = Date.parse(currentdateutc);
   const originalseconds = Date.parse(originaldateutc);
-  const secdif = (currentseconds-originalseconds)/1000
+  const secdif = (currentseconds - originalseconds)/1000  
+
+  const date2 = originaldateutc.slice(4, 11);   
+  const date3 = originaldateutc.slice(4, 11) + "," + originaldateutc.slice(11, 16); 
+
+  const classbutton = !doesLike ? "smalllogosdiv" : "smalllogosdiv scale-up-center";
+  const classbutton2 = !doesRetweet ? "smalllogosdiv" : "smalllogosdiv scale-up-center";
+
+
 
     return (
-
-
-
-<div className="tweet">  
+<div onClick={()=>{
+      props.setsingletweet(props.id)
+    }} className="tweet">  
       
       <img referrerPolicy="no-referrer" className="tweetuserimg" alt="" src={props.tweet.profilePicUrl}></img>
 
@@ -75,8 +122,8 @@ function Comment(props) {
         <h4>{props.tweet.name}</h4>
         {props.tweet.isverified ? <img alt="" src={process.env.PUBLIC_URL + "verified.svg"} className="smalllogos verifiedlogo"></img> : null}
         {props.tweet.isverifiedgold ? <img alt="" src={process.env.PUBLIC_URL + "premiumverified.svg"} className="smalllogos verifiedlogo"></img> : null}
-        <p className="timedif">@{props.tweet.name}</p> ·
-        <p className="timedif">{secdif > 86400 ? Math.floor(secdif/86400)+"d" : secdif > 3600 ? Math.floor(secdif/3600)+"h" : secdif > 60 ? Math.floor(secdif/60)+"m" : secdif+"s"}</p>
+        <p className="timedif">@{props.tweet.at}</p> ·
+        <p className="timedif">{secdif > (358 * 86400) ? date3 : secdif > 86400 ? date2 : secdif > 3600 ? Math.floor(secdif/3600)+"h" : secdif > 60 ? Math.floor(secdif/60)+"m" : secdif+"s"}</p>
         </div>
           {currentUser === props.tweet.author ? <div onClick={(e)=>{
           e.stopPropagation()
@@ -87,31 +134,35 @@ function Comment(props) {
       <p className="tweettext">{props.tweet.tweet}</p>
 
       <div className="bottweetdiv">
-      <div className="smalllogosdiv lowopacity">
-          <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "comment.svg"}></img><p className="font13">0</p>
+
+
+      <div className="smalllogosdiv">
+          <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "comment.svg"}></img><p className="font13">{props.tweet.comments}</p>
           </div>
+
+          
         {doesRetweet ? 
-          <div className="smalllogosdiv" onClick={(e)=>{
+          <div className={classbutton2} onClick={(e)=>{
             e.stopPropagation()
-            props.retweetComment(props.docid, props.id, props.tweet.retweets, props.tweet.userretweets)            
+            retweetCommentHere(props.docid, props.id, thistwt.retweets, thistwt.userretweets)            
             }}>
           <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "retweeted.svg"}></img><p className="font13">{thistwt ? thistwt.retweets : props.tweet.retweets}</p>
           </div> :          
-          <div className="smalllogosdiv" onClick={(e)=>{
+          <div className={classbutton2} onClick={(e)=>{
             e.stopPropagation()
-            props.retweetComment(props.docid, props.id, props.tweet.retweets, props.tweet.userretweets)            
+            retweetCommentHere(props.docid, props.id, thistwt.retweets, thistwt.userretweets)            
             }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "notretweeted.svg"}></img><p className="font13">
             {thistwt ? thistwt.retweets : props.tweet.retweets}</p>
           </div>
         }
 
-        {doesLike ?<div className="smalllogosdiv" onClick={(e)=>{
+        {doesLike ?<div className={classbutton} onClick={(e)=>{
           e.stopPropagation()
-          props.likeComment(props.docid, props.id, props.tweet.likes, props.tweet.userlikes)  
+          likeCommentHere(props.docid, props.id, thistwt.likes, thistwt.userlikes)  
           }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "liked.svg"}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
-        </div> : <div className="smalllogosdiv" onClick={(e)=>{
+        </div> : <div className={classbutton} onClick={(e)=>{
           e.stopPropagation()
-          props.likeComment(props.docid, props.id, props.tweet.likes, props.tweet.userlikes)
+          likeCommentHere(props.docid, props.id, thistwt.likes, thistwt.userlikes)
           }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "notliked.svg"}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
         </div>} 
         <p></p>

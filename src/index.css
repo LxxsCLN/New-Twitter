@@ -69,13 +69,7 @@ h1{
   margin-top: 20px;
 }
 
-.likedtweetbutton{
-  background-color: rgb(255, 131, 131);
-}
 
-.retweetedtweetbutton{
-  background-color: rgb(166, 255, 170);
-}
 
 .nav{
   
@@ -95,30 +89,10 @@ h1{
 }
 
 .scale-up-center>img {
-	-webkit-animation: scale-up-center 0.3s cubic-bezier(0.165, 0.840, 0.440, 1.000) both;
-	        animation: scale-up-center 0.3s cubic-bezier(0.165, 0.840, 0.440, 1.000) both;
+  transform: scale(1.1);
+  transition: 100ms;
 }
 
-@-webkit-keyframes scale-up-center {
-  0% {
-    -webkit-transform: scale(0.5);
-            transform: scale(0.5);
-  }
-  100% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-  }
-}
-@keyframes scale-up-center {
-  0% {
-    -webkit-transform: scale(0.5);
-            transform: scale(0.5);
-  }
-  100% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-  }
-}
 
 
 .tweet{

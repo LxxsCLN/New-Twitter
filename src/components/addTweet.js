@@ -24,9 +24,7 @@ function AddTweet() {
       };
 
     let tweetinput = useRef("");      
-    const empty = useRef("")
-
-    
+    const empty = useRef("")    
 
     async function submitTweet(){
       
@@ -38,14 +36,17 @@ function AddTweet() {
           await addDoc(collection(getFirestore(), "Tweets"), {
             author: getAuth().currentUser.uid,
             tweet: tweetinput.current,
-            name: getAuth().currentUser.displayName,
+            name: authordata.name,
+            at: authordata.at,
             profilePicUrl: getAuth().currentUser.photoURL || null,
             timestamp: serverTimestamp(),
             likes: 0,
             retweets: 0,
             comments: 0,
+            commentsarray: [],
             userlikes: [],
             userretweets: [],
+            iscomment: false,
             isverified: authordata.isverified,
             isverifiedgold: authordata.isverifiedgold,
           });

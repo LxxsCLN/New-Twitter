@@ -2,7 +2,7 @@ import { GoogleAuthProvider, getAuth, } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import React from "react"
 import { useNavigate, } from "react-router-dom";
-import {  useRef } from "react";
+import {  useRef, useState, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 import {
@@ -34,8 +34,6 @@ function SingleTweet(props) {
   const db = getFirestore();
 
   let tweetinput = useRef("");
-  
-  // const [tweet, setTweet] = useState("");
 
   const handleChange = (event) => {
     tweetinput.current = event.target.value;
@@ -46,10 +44,13 @@ function SingleTweet(props) {
   function handleClick(){
     empty.current.value = ""
   }
-
-  // const [isLiked, setIsLiked] = useState(false)
+  const [thistwt, setThisTwt] = useState(props.tweet) 
+  const [isLiked, setIsLiked] = useState(false)
+  const [doesLike, setDoesLike] = useState(props.tweet.userlikes.includes(getAuth().currentUser.uid))
+  const [doesRetweet, setDoesRetweet] = useState(props.tweet.userretweets.includes(auth.currentUser.uid))
   
   async function addComment(e){
+
     const docRef = doc(getFirestore(), "Tweets", props.id);
     const docSnap = await getDoc(docRef);
     const tweet2 = docSnap.data();
@@ -58,34 +59,39 @@ function SingleTweet(props) {
     const userSnap = await getDoc(userRef);
     const userdata = userSnap.data();
 
-    try {
-      await addDoc(collection(getFirestore(), "Tweets", props.id, "Comments"), {
-        author: getAuth().currentUser.uid,
-        tweet: tweetinput.current,
-        name: getAuth().currentUser.displayName,
-        profilePicUrl: getAuth().currentUser.photoURL || null,
-        timestamp: serverTimestamp(),
-        likes: 0,
-        retweets: 0,
-        userretweets: [],
-        userlikes: [],
-        isverified: userdata.isverified,
-        isverifiedgold: userdata.isverifiedgold,
-      });
-    }
-    catch(error) {
-      console.error('Error writing new message to Firebase Database', error);
-    }
+    const newcommentsarray = [...tweet2.commentsarray]
+
+  
+    const newcomment = await addDoc(collection(getFirestore(), "Tweets"), {
+      author: getAuth().currentUser.uid,
+      tweet: tweetinput.current,
+      name: userdata.name,
+      profilePicUrl: getAuth().currentUser.photoURL || null,
+      timestamp: serverTimestamp(),
+      likes: 0,
+      retweets: 0,
+      at: userdata.at,
+      userretweets: [],
+      parentid: docSnap.id,
+      comments: 0,
+      iscomment: true,
+      commentsarray: [],
+      userlikes: [],
+      isverified: userdata.isverified,
+      isverifiedgold: userdata.isverifiedgold,
+    });
+    
+    
     await updateDoc(docRef, {
-      comments: tweet2.comments + 1
+      comments: tweet2.comments + 1,
+      commentsarray: [...newcommentsarray, newcomment.id]
       });
       tweetinput.current = ""
       props.setIsLiked(!props.isLiked)
   }
+
   const [user, loading] = useAuthState(auth);
   const currentUser = getAuth().currentUser.uid;
-  const doesLike = props.tweet.userlikes.includes(getAuth().currentUser.uid)
-  const doesRetweet = props.tweet.userretweets.includes(getAuth().currentUser.uid)
 
   const date = props.tweet.timestamp.toDate().toDateString()
   const date2 = date.slice(4, 10) + "," + date.slice(10);    
@@ -97,24 +103,85 @@ function SingleTweet(props) {
   const ampm = hoursindex < 12 ? " a.m. · " : " p.m. · "
   const finaldate = realhour + ":" + minutes + ampm + date2;
 
+
+  async function likeTweetHere(id, likes, usrlikes){
+
+    const doesLike = usrlikes.includes(getAuth().currentUser.uid)
+    const newuserlikes = [...usrlikes] 
+    const currTWT = doc(getFirestore(), "Tweets", id);
+    let newlikes = likes;
+
+    if (!doesLike){
+      newlikes += 1;
+      newuserlikes.push(getAuth().currentUser.uid)  
+    } else {
+      let index = usrlikes.indexOf(getAuth().currentUser.uid)
+      newuserlikes.splice(index, 1); 
+      newlikes -= 1; 
+    }
+    await updateDoc(currTWT, {
+      likes: newlikes,
+      userlikes: newuserlikes,
+      });
+    setIsLiked(!isLiked)
+  }
+
+  async function retweetHere(id, retweets, usrretweets){
+
+    const doesRetweet = usrretweets.includes(getAuth().currentUser.uid)
+    const newuserretweets = [...usrretweets] 
+    const currTWT = doc(getFirestore(), "Tweets", id);
+    let newretweets = retweets;
+
+    if (!doesRetweet){
+      newretweets += 1;
+      newuserretweets.push(getAuth().currentUser.uid)  
+    } else {
+      let index = usrretweets.indexOf(getAuth().currentUser.uid)
+      newuserretweets.splice(index, 1); 
+      newretweets -= 1; 
+    }
+    await updateDoc(currTWT, {
+      retweets: newretweets,
+      userretweets: newuserretweets,
+      });
+    setIsLiked(!isLiked)
+    
+  }
+
+  useEffect(()=>{
+    const loadtwt = async() => {
+      const docRef = doc(db, "Tweets", props.id);
+      const docSnap = await getDoc(docRef);
+      const tweet = docSnap.data();
+      setThisTwt(tweet) 
+      setDoesLike(tweet.userlikes.includes(getAuth().currentUser.uid))
+      setDoesRetweet(tweet.userretweets.includes(getAuth().currentUser.uid))
+    }
+    loadtwt()      
+  }, [isLiked])  
+
+  const classbutton = !doesLike ? "smalllogosdiv" : "smalllogosdiv scale-up-center";
+  const classbutton2 = !doesRetweet ? "smalllogosdiv" : "smalllogosdiv scale-up-center";
   
   return (
     <div>
     <div className="singletweet">       
              
-        <img className=" tweetuserimg tweetuserimgsingle " alt="" src={props.authordata.profilePicUrl}></img>
+        <img className=" tweetuserimg tweetuserimgsingle " alt="" src={props.tweet.profilePicUrl}></img>
 
         <div className="toptweetdiv">
-        <div className="singletweetname">{props.authordata.name}   {props.tweet.isverified ? <img alt="" src={process.env.PUBLIC_URL + "verified.svg"} className="smalllogos verifiedlogo"></img> : null}
+        <div className="singletweetname">{props.tweet.name}   {props.tweet.isverified ? <img alt="" src={process.env.PUBLIC_URL + "verified.svg"} className="smalllogos verifiedlogo"></img> : null}
         {props.tweet.isverifiedgold ? <img alt="" src={process.env.PUBLIC_URL + "premiumverified.svg"} className="smalllogos verifiedlogo"></img> : null}</div>
-        {currentUser === props.tweet.author ? <div onClick={(e)=>{
+        {currentUser === props.tweet.author ? <div onClick={async (e)=>{
         e.preventDefault()
-        props.deleteTweet(props.id)
+        
+        await props.updateParentTweet(props.id)
         navigate("/home", true)
         }} ><img className="smalllogos" alt="" src={process.env.PUBLIC_URL + "delete.svg"}></img></div> : null}
         
         </div>
-        <p className="timedif">@{props.authordata.at}</p>
+        <p className="timedif">@{props.tweet.at}</p>
         <p className="singletweettext spantwocolumn">{props.tweet.tweet}</p>
         <p className="finaldate spantwocolumn">{finaldate}</p>
         
@@ -123,30 +190,30 @@ function SingleTweet(props) {
 
 
         {doesRetweet ? 
-          <div className="smalllogosdiv" onClick={(e)=>{
+          <div className={classbutton2} onClick={(e)=>{
             e.stopPropagation()
-            props.retweet(props.id, props.tweet.retweets, props.tweet.userretweets)          
+            retweetHere(props.id, thistwt.retweets, thistwt.userretweets)          
             }}>
-          <img alt="" className="smalllogos2" src={process.env.PUBLIC_URL + "retweeted.svg"}></img><p className="font14">{props.tweet.retweets}</p>
+          <img alt="" className="smalllogos2" src={process.env.PUBLIC_URL + "retweeted.svg"}></img><p className="font14">{thistwt ? thistwt.retweets : props.tweet.retweets}</p>
           </div> :          
-          <div className="smalllogosdiv" onClick={(e)=>{
+          <div className={classbutton2} onClick={(e)=>{
             e.stopPropagation()
-            props.retweet(props.id, props.tweet.retweets, props.tweet.userretweets)          
+            retweetHere(props.id, thistwt.retweets, thistwt.userretweets)          
             }}><img alt="" className="smalllogos2" src={process.env.PUBLIC_URL + "notretweeted.svg"}></img><p className="font14">
-            {props.tweet.retweets}</p>
+            {thistwt ? thistwt.retweets : props.tweet.retweets}</p>
           </div>
         }
 
          
 
-{doesLike ?<div className="smalllogosdiv" onClick={(e)=>{
+{doesLike ?<div className={classbutton} onClick={(e)=>{
           e.stopPropagation()
-          props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)          
-          }}><img alt="" className="smalllogos2" src={process.env.PUBLIC_URL + "liked.svg"}></img><p className="font14">{props.tweet.likes}</p>
-        </div> : <div className="smalllogosdiv" onClick={(e)=>{
+          likeTweetHere(props.id, thistwt.likes, thistwt.userlikes)          
+          }}><img alt="" className="smalllogos2" src={process.env.PUBLIC_URL + "liked.svg"}></img><p className="font14">{thistwt ? thistwt.likes : props.tweet.likes}</p>
+        </div> : <div className={classbutton} onClick={(e)=>{
           e.stopPropagation()
-          props.likeTweet(props.id, props.tweet.likes, props.tweet.userlikes)          
-          }}><img alt="" className="smalllogos2" src={process.env.PUBLIC_URL + "notliked.svg"}></img><p className="font14">{props.tweet.likes}</p>
+          likeTweetHere(props.id, thistwt.likes, thistwt.userlikes)          
+          }}><img alt="" className="smalllogos2" src={process.env.PUBLIC_URL + "notliked.svg"}></img><p className="font14">{thistwt ? thistwt.likes : props.tweet.likes}</p>
         </div>} 
           
           </div>
