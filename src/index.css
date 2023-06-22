@@ -173,14 +173,38 @@ h1{
   max-width: 230px;
 }
 
-.writetweet{
+.replyformbig{
   display: grid;
   grid-template-columns: .8fr 5fr 1.6fr;
   grid-template-rows: auto auto auto auto;
   gap: 10px;
   padding: 8px 12px;
+  align-items: center;
   border-bottom: 1px solid rgb(239, 243, 244);
 }
+
+
+.commentinputbig{
+  border: none;
+  font-size: 20px;
+  text-justify: center;
+  max-width: 230px;
+  border: none;
+}
+
+.commentinputbig:focus{
+  outline: none;
+}
+
+.writetweet{
+  display: grid;
+  grid-template-columns: .8fr 5fr 1.6fr;
+  grid-template-rows: auto auto auto;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgb(239, 243, 244);
+}
+
 
 .tweetinput{
   border: none;
@@ -203,6 +227,61 @@ h1{
 
 .span3cols{
   grid-column: span 2;
+}
+
+.span3col{
+  grid-column: span 3;
+}
+
+p.span3col{
+  text-align: center;
+}
+
+.span4cols{
+  grid-column: span 3;
+  position: relative;
+}
+
+.addimagelabel{
+  background-color: white;
+  display: flex;
+  gap: 10px;
+  white-space: nowrap;
+  align-items: center;
+}
+
+input[type=file] {
+  z-index: -1;
+}
+
+.addimageimage{
+  max-width: calc(100% - 50px);
+  max-height: 100%;
+  border-radius: 16px;
+  margin-left: 50px;
+}
+
+.onehund{
+  width: 100px;
+  height: 100px;
+}
+
+.removeimgsvgdiv{
+  position: absolute;
+  border-radius: 100%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: black;
+  left: 54px;
+  top: 4px;
+}
+
+.removeimgsvgsvg{
+  width: 18px;
+  height: 18px;
 }
 
 .everyone{
@@ -235,7 +314,7 @@ h1{
 }
 
 .lowopacity{
-  opacity: .4;
+  opacity: .5;
 }
 
 .width28{
@@ -349,6 +428,11 @@ h4{
 
 .tweetuserimgsingle{
   grid-row: span 2;
+}
+
+.tweetuserimgsingle2{
+  grid-row: span 1;
+  align-self: baseline;
 }
 
 

@@ -4,6 +4,7 @@ import React from "react"
 import { useNavigate, } from "react-router-dom";
 import {  useRef, useState, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
+import uniqid from 'uniqid';
 
 import {
   getFirestore,
@@ -14,6 +15,14 @@ import {
   getDoc,
   serverTimestamp,
 } from 'firebase/firestore';
+
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+  uploadBytes
+} from 'firebase/storage';
 
 function SingleTweet(props) {
 
@@ -39,6 +48,23 @@ function SingleTweet(props) {
     tweetinput.current = event.target.value;
   };
 
+  function resetInput(){
+    let randomString = Math.random().toString(36);
+    setKeyState(randomString)
+  }
+
+  const handleImageChange = (e) => {  
+    imgtweetinput.current = e.target.files[0]
+    setImgSrc(URL.createObjectURL(e.target.files[0]))
+  }
+
+  const removeImage = (e) => { 
+    setImgSrc("")      
+    resetInput()  
+    imgtweetinput.current = ""
+  }
+
+  let imgtweetinput = useRef(""); 
   const empty = useRef("")
 
   function handleClick(){
@@ -48,8 +74,18 @@ function SingleTweet(props) {
   const [isLiked, setIsLiked] = useState(false)
   const [doesLike, setDoesLike] = useState(props.tweet.userlikes.includes(getAuth().currentUser.uid))
   const [doesRetweet, setDoesRetweet] = useState(props.tweet.userretweets.includes(auth.currentUser.uid))
+  const [display, setDisplay] = useState(false)
+  const [imgSrc, setImgSrc] = useState("")
+  const [keyState, setKeyState] = useState()
   
   async function addComment(e){
+    let publicImageUrl = "";
+    if (imgtweetinput.current !== ""){
+      let uniq = uniqid()
+      const newImageRef = ref(getStorage(), `images/${uniq}`);
+      await uploadBytes(newImageRef, imgtweetinput.current)
+      publicImageUrl = await getDownloadURL(newImageRef);
+    }
 
     const docRef = doc(getFirestore(), "Tweets", props.id);
     const docSnap = await getDoc(docRef);
@@ -60,7 +96,6 @@ function SingleTweet(props) {
     const userdata = userSnap.data();
 
     const newcommentsarray = [...tweet2.commentsarray]
-
   
     const newcomment = await addDoc(collection(getFirestore(), "Tweets"), {
       author: getAuth().currentUser.uid,
@@ -75,6 +110,7 @@ function SingleTweet(props) {
       parentid: docSnap.id,
       comments: 0,
       iscomment: true,
+      imgurl: publicImageUrl,
       commentsarray: [],
       userlikes: [],
       isverified: userdata.isverified,
@@ -87,6 +123,7 @@ function SingleTweet(props) {
       commentsarray: [...newcommentsarray, newcomment.id]
       });
       tweetinput.current = ""
+      imgtweetinput.current = ""
       props.setIsLiked(!props.isLiked)
   }
 
@@ -183,6 +220,7 @@ function SingleTweet(props) {
         </div>
         <p className="timedif">@{props.tweet.at}</p>
         <p className="singletweettext spantwocolumn">{props.tweet.tweet}</p>
+        {props.tweet.imgurl === "" ? null : <img className="onehund" alt="" src={props.tweet.imgurl}></img>}
         <p className="finaldate spantwocolumn">{finaldate}</p>
         
           <div className="bottweetdiv bottweetdiv2 spantwocolumn">
@@ -219,18 +257,42 @@ function SingleTweet(props) {
           </div>
         </div>
 
-        <form className="replyform">
-        <img className=" tweetuserimg tweetuserimgsingle " alt="" src={user.photoURL}></img>
-          <input ref={empty} onChange={handleChange} className="commentinput" placeholder="Tweet your reply!"></input>
+        
+
+          {!display ? 
+          <form className="replyform" onClick={() =>{
+            setDisplay(!display)
+          } }>
+          <img className=" tweetuserimg tweetuserimgsingle " alt="" src={user.photoURL}></img>
+          <input className="commentinput" placeholder="Tweet your reply!"></input>
+          <button className="replybutton lowopacity" >Reply</button>
+        </form> : 
+
+        <form className="replyformbig">
+        <p className="span3col">Replying to: @{props.tweet.at}</p>
+        <img className=" tweetuserimg tweetuserimgsingle2 " alt="" src={user.photoURL}></img>
+          <textarea autoFocus rows={3} ref={empty} onChange={handleChange} className="commentinputbig span2cols" placeholder="Tweet your reply!"></textarea>
+          {imgSrc === "" ? null : <div className="span4cols"><p></p><div className="removeimgsvgdiv" onClick={ (e) =>{
+          e.preventDefault()
+          removeImage();
+        } }><img className="removeimgsvgsvg" alt="" src={process.env.PUBLIC_URL + "removeimgsvg.svg"} ></img></div><img className="addimageimage " alt="" src={imgSrc}></img></div> }
+          
+          <label htmlFor="mediaCapture" className="addimagelabel span3cols">
+          <img alt="" src={process.env.PUBLIC_URL + "addimage.svg"} className="smalllogos verifiedlogo"></img>
+          Choose image
+          <input onChange={(e) => {
+            e.preventDefault()            
+            handleImageChange(e)
+          }} key={keyState} id="mediaCapture" type="file" accept="image/*" capture="camera"></input>
+        </label>
           <button className="replybutton" onClick={(e)=>{
             e.preventDefault()
-            if (tweetinput.current === "") return
+            // if (tweetinput.current === "") return
             handleClick()
             addComment()
           } } >Reply</button>
-        </form>
-
-
+        </form>}
+          
     </div>
   );
 }

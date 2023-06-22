@@ -187,6 +187,7 @@ async function saveImageMessage(file) {
       </div>
 
       <p className="tweettext">{props.tweet.tweet}</p>
+      {props.tweet.imgurl === "" ? null : <img className="onehund" alt="" src={props.tweet.imgurl}></img>}
 
       <div className="bottweetdiv">
         <div className="smalllogosdiv"> <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "comment.svg"}></img><p className="font13">{props.tweet.comments}</p></div>

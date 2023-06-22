@@ -32,7 +32,7 @@ function Comment(props) {
   const [isLiked, setIsLiked] = useState(false)
   const [doesLike, setDoesLike] = useState(props.tweet.userlikes.includes(getAuth().currentUser.uid))
   const [doesRetweet, setDoesRetweet] = useState(props.tweet.userretweets.includes(auth.currentUser.uid))
-
+  
   
 
   
@@ -132,6 +132,7 @@ function Comment(props) {
       </div>
 
       <p className="tweettext">{props.tweet.tweet}</p>
+      {props.tweet.imgurl === "" ? null : <img className="onehund" alt="" src={props.tweet.imgurl}></img>}
 
       <div className="bottweetdiv">
 
@@ -144,13 +145,13 @@ function Comment(props) {
         {doesRetweet ? 
           <div className={classbutton2} onClick={(e)=>{
             e.stopPropagation()
-            retweetCommentHere(props.docid, props.id, thistwt.retweets, thistwt.userretweets)            
+            retweetCommentHere(props.id, thistwt.retweets, thistwt.userretweets)            
             }}>
           <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "retweeted.svg"}></img><p className="font13">{thistwt ? thistwt.retweets : props.tweet.retweets}</p>
           </div> :          
           <div className={classbutton2} onClick={(e)=>{
             e.stopPropagation()
-            retweetCommentHere(props.docid, props.id, thistwt.retweets, thistwt.userretweets)            
+            retweetCommentHere(props.id, thistwt.retweets, thistwt.userretweets)            
             }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "notretweeted.svg"}></img><p className="font13">
             {thistwt ? thistwt.retweets : props.tweet.retweets}</p>
           </div>
@@ -158,11 +159,11 @@ function Comment(props) {
 
         {doesLike ?<div className={classbutton} onClick={(e)=>{
           e.stopPropagation()
-          likeCommentHere(props.docid, props.id, thistwt.likes, thistwt.userlikes)  
+          likeCommentHere(props.id, thistwt.likes, thistwt.userlikes)  
           }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "liked.svg"}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
         </div> : <div className={classbutton} onClick={(e)=>{
           e.stopPropagation()
-          likeCommentHere(props.docid, props.id, thistwt.likes, thistwt.userlikes)
+          likeCommentHere(props.id, thistwt.likes, thistwt.userlikes)
           }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "notliked.svg"}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
         </div>} 
         <p></p>
