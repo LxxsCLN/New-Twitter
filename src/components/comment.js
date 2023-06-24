@@ -114,7 +114,7 @@ function Comment(props) {
 
     return (
 <div onClick={()=>{
-      navigate(`/viewtweet/${props.id}`, { state: { tweetID: props.id }});
+      navigate(`/viewtweet/${props.id}`);
     }} className="tweet">  
       
       <img referrerPolicy="no-referrer" className="tweetuserimg" alt="" src={props.tweet.profilePicUrl}></img>
@@ -134,7 +134,10 @@ function Comment(props) {
       </div>
 
       {props.tweet.tweet !== "" ? <p className="tweettext margin50">{props.tweet.tweet}</p> : null}
-      {props.tweet.imgurl === "" ? null : <img className="onehund border16 margin50" alt="" src={props.tweet.imgurl}></img>}
+      {props.tweet.imgurl === "" ? null : <img className="onehund border16 margin50" alt="" src={props.tweet.imgurl} onClick={(e)=>{
+        e.stopPropagation()
+        e.preventDefault()
+        navigate(`/viewtweet/${props.id}/viewimage`)}}></img>}
 
       <div className="bottweetdiv">
 

@@ -204,7 +204,7 @@ function SingleTweet(props) {
     <div>
     <div className="singletweet">       
              
-        <img className=" tweetuserimg tweetuserimgsingle " alt="" src={props.tweet.profilePicUrl}></img>
+        <img className="tweetuserimg tweetuserimgsingle " alt="" src={props.tweet.profilePicUrl}></img>
 
         <div className="toptweetdiv">
         <div className="singletweetname">{props.tweet.name}   {props.tweet.isverified ? <img alt="" src={process.env.PUBLIC_URL + "verified.svg"} className="smalllogos verifiedlogo"></img> : null}
@@ -221,12 +221,15 @@ function SingleTweet(props) {
         {props.tweet.tweet !== "" ? <p className="singletweettext spantwocolumn">{props.tweet.tweet}</p> : null}
         
 
-        {props.tweet.imgurl === "" ? null : <img className="onehund border16 spantwocolumn" alt="" src={props.tweet.imgurl}></img>}
+        {props.tweet.imgurl === "" ? null : <img className="onehund border16 spantwocolumn" alt="" src={props.tweet.imgurl} onClick={(e)=>{
+        e.stopPropagation()
+        e.preventDefault()
+        navigate(`/viewtweet/${props.id}/viewimage`)}} ></img>}
 
         <p className="finaldate spantwocolumn">{finaldate}</p>
         
-          <div className="bottweetdiv bottweetdiv2 spantwocolumn">
-          <div className="smalllogosdiv"> <img alt="" className="smalllogos2" src={process.env.PUBLIC_URL + "comment.svg"}></img><p className="font14">{props.tweet.comments}</p></div>
+        <div className="bottweetdiv bottweetdiv2 spantwocolumn">
+        <div className="smalllogosdiv"> <img alt="" className="smalllogos2" src={process.env.PUBLIC_URL + "comment.svg"}></img><p className="font14">{props.tweet.comments}</p></div>
 
 
         {doesRetweet ? 
@@ -246,7 +249,7 @@ function SingleTweet(props) {
 
          
 
-{doesLike ?<div className={classbutton} onClick={(e)=>{
+        {doesLike ?<div className={classbutton} onClick={(e)=>{
           e.stopPropagation()
           likeTweetHere(props.id, thistwt.likes, thistwt.userlikes)          
           }}><img alt="" className="smalllogos2" src={process.env.PUBLIC_URL + "liked.svg"}></img><p className="font14">{thistwt ? thistwt.likes : props.tweet.likes}</p>

@@ -17,7 +17,7 @@ import {
 
 function ViewTweet() {
 
-  const { tweetID2 } = useParams()
+  const { tweetID } = useParams()
 
   const [isLiked, setIsLiked] = useState(false)
   const db = getFirestore();
@@ -85,9 +85,10 @@ function ViewTweet() {
     
     const loadTweets = async () => {
 
-      const singletwt = doc(getFirestore(), "Tweets", tweetID2); 
+      const singletwt = doc(getFirestore(), "Tweets", tweetID); 
       const singletwtSnap = await getDoc(singletwt);
       const singletwtdata = singletwtSnap.data() 
+
 
       let thistwt = <SingleTweet updateParentTweet={updateParentTweet} key={uniqid()} tweet={singletwtdata} id={singletwtSnap.id} handleChange={handleChange} isLiked={isLiked} setIsLiked={setIsLiked} deleteTweet={deleteTweet} />
       setTweet(thistwt) 
@@ -116,7 +117,7 @@ function ViewTweet() {
       })
     }
     loadTweets()
-  }, [isLiked, tweetID2])
+  }, [isLiked, tweetID])
    
 
 

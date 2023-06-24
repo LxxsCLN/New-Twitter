@@ -14,6 +14,7 @@ import Login from "./components/login";
 import Home from "./components/home";
 import ViewTweet from "./components/viewtweet";
 import AddTweet from './components/addTweet';
+import ViewImage from './components/viewImage';
 
 
 function App() {
@@ -40,8 +41,9 @@ function App() {
       <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/home" element={<Home />} />
-      <Route path={`/viewtweet/:tweetID2`} element={<ViewTweet  />} />
+      <Route path={`/viewtweet/:tweetID`} element={<ViewTweet  />} />
       <Route path='/addtweet' element={<AddTweet />} />
+      <Route path='/viewtweet/:tweetID/viewimage' element={<ViewImage />} />
       </Routes>
     </HashRouter>
   );
