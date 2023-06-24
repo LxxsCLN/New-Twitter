@@ -27,6 +27,7 @@ function AddTweet() {
 
     const { quoteID } = useParams()
     const db = getFirestore();  
+    console.log("quoteid: ", quoteID)
 
     const [quotedata, setquotedata] = useState()
 
@@ -84,6 +85,8 @@ function AddTweet() {
           const docRef = doc(getFirestore(), "Users", getAuth().currentUser.uid);
           const docSnap = await getDoc(docRef);
           const authordata = docSnap.data()
+          const isquo = quoteID ? true : false;
+          const whatquo = quoteID ? quoteID : "";
 
           await addDoc(collection(getFirestore(), "Tweets"), {
             author: getAuth().currentUser.uid,
@@ -99,8 +102,8 @@ function AddTweet() {
             commentsarray: [],
             userlikes: [],
             userretweets: [],
-            isquote: false,
-            quoteto: "",
+            isquote: isquo,
+            quoteto: whatquo,
             iscomment: false,
             isverified: authordata.isverified,
             isverifiedgold: authordata.isverifiedgold,

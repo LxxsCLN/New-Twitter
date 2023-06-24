@@ -10,6 +10,7 @@ import {
   getDoc,
   updateDoc
 } from 'firebase/firestore';
+import QuoteTweet from "./quotetweet";
 
 
 function Tweet(props) {
@@ -28,6 +29,7 @@ function Tweet(props) {
   const auth = getAuth();
 
   const [thistwt, setThisTwt] = useState(props.tweet)  
+  const [quotedata, setquotedata] = useState()  
   
   const currentUser = auth.currentUser.uid;
   
@@ -58,6 +60,13 @@ function Tweet(props) {
       setThisTwt(tweet) 
       setDoesLike(tweet.userlikes.includes(getAuth().currentUser.uid))
       setDoesRetweet(tweet.userretweets.includes(getAuth().currentUser.uid))
+
+      if (props.tweet.isquote){
+        const docRef = doc(db, "Tweets", props.tweet.quoteto);
+        const docSnap = await getDoc(docRef);
+        const tweet = docSnap.data();
+        setquotedata(tweet)
+      }
     }
     loadtwt()      
   }, [isLiked])  
@@ -153,7 +162,16 @@ function Tweet(props) {
         navigate(`/viewtweet/${props.id}/viewimage`);
       }}></img>}
 
+      
+      {props.tweet.isquote ? null : <p></p>}
+
+      {props.tweet.isquote ? <QuoteTweet quoteID={thistwt.quoteto} tweet={quotedata} issingle={false} /> : null}
+      {props.tweet.tweet && props.tweet.imgurl ? <p></p> : null}
+      <p></p>
+      <p></p>
       <div className="bottweetdiv">
+
+      
 
         <div className="smalllogosdiv"> <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "comment.svg"}></img><p className="font13">{props.tweet.comments}</p></div>
 

@@ -1,6 +1,8 @@
 import React from "react"
 import {  useState, useEffect } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 import {
   getFirestore,
   doc,
@@ -10,7 +12,9 @@ import {
 
 function QuoteTweet(props) {
 
+    const classn = props.issingle ? "span2cols" : "span2cols spanone"
 
+    const navigate = useNavigate();
     const currentdate = new Date()
     const currentdateutc = currentdate.toUTCString()
     const originaldateutc = props.tweet ? props.tweet.timestamp.toDate().toUTCString() : ""
@@ -22,12 +26,13 @@ function QuoteTweet(props) {
     const date3 = originaldateutc.slice(4, 11) + "," + originaldateutc.slice(11, 16); 
 
     return (
-        <div className="span2cols">
+        <div onClick={(e)=>{
+            e.stopPropagation()
+            navigate(`/viewtweet/${props.quoteID}`);
+        }} className={classn}>
         {props.tweet ?        
 
-            <div className="quotetweet"> 
-
-            
+            <div className="quotetweet">            
       
             <div className="toptweetdiv2">
             <img referrerPolicy="no-referrer" className="quotetweetuserimg" alt="" src={props.tweet.profilePicUrl}></img>

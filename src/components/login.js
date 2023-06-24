@@ -36,10 +36,7 @@ function Login() {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      console.log("already user");
-
     } else {
-      console.log("create user");
       setDoc(doc(db, "Users", auth.currentUser.uid), {
         userid: auth.currentUser.uid,
         name: auth.currentUser.displayName,

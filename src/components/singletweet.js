@@ -5,6 +5,7 @@ import { useNavigate, } from "react-router-dom";
 import {  useRef, useState, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import uniqid from 'uniqid';
+import QuoteTweet from "./quotetweet";
 
 import {
   getFirestore,
@@ -42,6 +43,7 @@ function SingleTweet(props) {
   const db = getFirestore();
 
   let tweetinput = useRef("");
+  const [quotedata, setquotedata] = useState() 
 
   const handleChange = (event) => {
     tweetinput.current = event.target.value;
@@ -195,6 +197,13 @@ function SingleTweet(props) {
       setThisTwt(tweet) 
       setDoesLike(tweet.userlikes.includes(getAuth().currentUser.uid))
       setDoesRetweet(tweet.userretweets.includes(getAuth().currentUser.uid))
+
+      if (props.tweet.isquote){
+        const docRef = doc(db, "Tweets", props.tweet.quoteto);
+        const docSnap = await getDoc(docRef);
+        const tweet = docSnap.data();
+        setquotedata(tweet)
+      }
     }
     loadtwt()      
   }, [isLiked])  
@@ -235,6 +244,8 @@ function SingleTweet(props) {
         e.stopPropagation()
         e.preventDefault()
         navigate(`/viewtweet/${props.id}/viewimage`)}} ></img>}
+
+      {props.tweet.isquote ? <QuoteTweet quoteID={thistwt.quoteto} tweet={quotedata} issingle={true} /> : null}
 
         <p className="finaldate spantwocolumn">{finaldate}</p>
         
@@ -299,23 +310,34 @@ function SingleTweet(props) {
 
 
         
-        {hidden ? null : <div onClick={(e)=>{
+        
+
+
+      {hidden ? null : <div onClick={(e)=>{
         e.stopPropagation()
         hiddenHandler()
       }} className="overlay">
         <div  className="typeofquotediv">
-          <div onClick={() =>{
+
+          <div className="smalllogosdiv" onClick={() =>{
             retweetHere(props.id, thistwt.retweets, thistwt.userretweets)
-          }}>{doesRetweet ? "Undo Retweet" : "Retweet"}</div>
-          <div onClick={(e)=>{
-        e.stopPropagation()
-        navigate(`/addtweet/quote/${props.id}`, true)
-      }}>Quote Tweet</div>
-          <button onClick={(e)=>{
+          }}>
+            <img alt="" src={process.env.PUBLIC_URL + "retweet.svg"}></img>
+            <p>{doesRetweet ? "Undo Retweet" : "Retweet"}</p></div>
+
+          <div className="smalllogosdiv" onClick={(e)=>{
+            e.stopPropagation()
+            navigate(`/addtweet/quote/${props.id}`, true)
+          }}>
+            <img alt="" src={process.env.PUBLIC_URL + "quoteretweet.svg"}></img>
+            <p>Quote Tweet</p></div>
+
+          <button className="cancelquote" onClick={(e)=>{
             e.preventDefault()
             e.stopPropagation()
             hiddenHandler()
-      }}>Cancel</button>
+          }}>Cancel</button>
+
         </div>
       </div> }
 

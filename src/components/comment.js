@@ -139,14 +139,14 @@ function Comment(props) {
           props.deleteComment(props.docid, props.id)}}><img className="smalllogos" alt="" src={process.env.PUBLIC_URL + "delete.svg"}></img></div> : null}
       </div>
 
-      {props.tweet.tweet !== "" ? <p className="tweettext margin50">{props.tweet.tweet}</p> : null}
-      {props.tweet.imgurl === "" ? null : <img className="onehund border16 margin50" alt="" src={props.tweet.imgurl} onClick={(e)=>{
+      {props.tweet.tweet !== "" ? <p className="tweettext margin50">{props.tweet.tweet}</p> : <p></p>}
+      {props.tweet.imgurl === "" ? <p></p> : <img className="onehund border16 margin50" alt="" src={props.tweet.imgurl} onClick={(e)=>{
         e.stopPropagation()
         e.preventDefault()
         navigate(`/viewtweet/${props.id}/viewimage`)}}></img>}
-
+  <p></p>
+  <p></p>
       <div className="bottweetdiv">
-
 
       <div className="smalllogosdiv">
           <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "comment.svg"}></img><p className="font13">{props.tweet.comments}</p>
@@ -168,25 +168,36 @@ function Comment(props) {
 
         <p></p>
       </div>
+      
       {hidden ? null : <div onClick={(e)=>{
         e.stopPropagation()
         hiddenHandler()
       }} className="overlay">
         <div  className="typeofquotediv">
-          <div onClick={() =>{
+
+          <div className="smalllogosdiv" onClick={() =>{
             retweetCommentHere(props.id, thistwt.retweets, thistwt.userretweets)
-          }}>{doesRetweet ? "Undo Retweet" : "Retweet"}</div>
-          <div onClick={(e)=>{
-        e.stopPropagation()
-        navigate(`/addtweet/quote/${props.id}`, true)
-      }}>Quote Tweet</div>
-          <button onClick={(e)=>{
+          }}>
+            <img alt="" src={process.env.PUBLIC_URL + "retweet.svg"}></img>
+            <p>{doesRetweet ? "Undo Retweet" : "Retweet"}</p></div>
+
+          <div className="smalllogosdiv" onClick={(e)=>{
+            e.stopPropagation()
+            navigate(`/addtweet/quote/${props.id}`, true)
+          }}>
+            <img alt="" src={process.env.PUBLIC_URL + "quoteretweet.svg"}></img>
+            <p>Quote Tweet</p></div>
+
+          <button className="cancelquote" onClick={(e)=>{
             e.preventDefault()
-        e.stopPropagation()
-        hiddenHandler()
-      }}>Cancel</button>
+            e.stopPropagation()
+            hiddenHandler()
+          }}>Cancel</button>
+
         </div>
       </div> }
+
+
     </div>
 
 

@@ -101,7 +101,6 @@ function Home() {
     loadTweets() 
   }, [isLiked, hidden])
 
-  console.log(hidden)
 
   return (
     
