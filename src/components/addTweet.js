@@ -1,6 +1,6 @@
 import {  getAuth, } from "firebase/auth";
-import React from "react"
-import { useNavigate, } from "react-router-dom";
+import React, { useEffect } from "react"
+import { useNavigate, useParams } from "react-router-dom";
 import {  useRef, useState } from "react";
 import uniqid from 'uniqid';
 
@@ -21,8 +21,14 @@ import {
 } from 'firebase/firestore';
 
 import Nav from "./nav";
+import QuoteTweet from "./quotetweet";
 
 function AddTweet() {
+
+    const { quoteID } = useParams()
+    const db = getFirestore();  
+
+    const [quotedata, setquotedata] = useState()
 
     const [imgSrc, setImgSrc] = useState("")
     const navigate = useNavigate();
@@ -51,6 +57,18 @@ function AddTweet() {
     let tweetinput = useRef(""); 
     let imgtweetinput = useRef("");     
     let empty = useRef("");    
+
+    useEffect(()=>{
+      async function loadquote(){
+        
+          const docRef = doc(db, "Tweets", quoteID);
+          const docSnap = await getDoc(docRef);
+          const tweet = docSnap.data();
+          setquotedata(tweet)
+      }
+      if (quoteID){
+      loadquote()}
+    },[])
 
     
 
@@ -81,6 +99,8 @@ function AddTweet() {
             commentsarray: [],
             userlikes: [],
             userretweets: [],
+            isquote: false,
+            quoteto: "",
             iscomment: false,
             isverified: authordata.isverified,
             isverifiedgold: authordata.isverifiedgold,
@@ -116,6 +136,10 @@ function AddTweet() {
           removeImage();
         } }><img className="removeimgsvgsvg" alt="" src={process.env.PUBLIC_URL + "removeimgsvg.svg"} ></img></div><img className="addimageimage " alt="" src={imgSrc}></img></div> }
         
+        {quoteID ? <p></p> : null}
+        {quoteID ? <QuoteTweet quoteID={quoteID} tweet={quotedata} /> : null}
+        
+
         <label htmlFor="mediaCapture" className="addimagelabel span3cols">
           <img alt="" src={process.env.PUBLIC_URL + "addimage.svg"} className="smalllogos verifiedlogo"></img>
           Choose image
@@ -123,12 +147,7 @@ function AddTweet() {
             e.preventDefault()            
             handleImageChange(e)
           }} key={keyState} id="mediaCapture" type="file" accept="image/*"></input>
-        </label>
-
-        
-          
-
-        
+        </label>   
       </form>  
       <div className="everyonecanreply span3cols"><img alt="" src={process.env.PUBLIC_URL + "world.svg"} className="smalllogos"></img>Everyone can reply</div>
       

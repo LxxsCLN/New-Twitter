@@ -109,8 +109,14 @@ function Comment(props) {
 
   const classbutton = !doesLike ? "smalllogosdiv" : "smalllogosdiv scale-up-center";
   const classbutton2 = !doesRetweet ? "smalllogosdiv" : "smalllogosdiv scale-up-center";
+  
+  const likesrc = !doesLike ? "notliked.svg" : "liked.svg"
+  const retweetsrc = !doesRetweet ? "notretweeted.svg" : "retweeted.svg"
+  const [hidden, setHidden] = useState(true)
 
-
+  function hiddenHandler(){
+    setHidden(!hidden)  
+  }
 
     return (
 <div onClick={()=>{
@@ -147,33 +153,40 @@ function Comment(props) {
           </div>
 
           
-        {doesRetweet ? 
-          <div className={classbutton2} onClick={(e)=>{
-            e.stopPropagation()
-            retweetCommentHere(props.id, thistwt.retweets, thistwt.userretweets)            
-            }}>
-          <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "retweeted.svg"}></img><p className="font13">{thistwt ? thistwt.retweets : props.tweet.retweets}</p>
-          </div> :          
-          <div className={classbutton2} onClick={(e)=>{
-            e.stopPropagation()
-            retweetCommentHere(props.id, thistwt.retweets, thistwt.userretweets)            
-            }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "notretweeted.svg"}></img><p className="font13">
-            {thistwt ? thistwt.retweets : props.tweet.retweets}</p>
-          </div>
-        }
+        <div className={classbutton2} onClick={(e)=>{
+          e.stopPropagation()
+          hiddenHandler()         
+          }}>
+        <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + retweetsrc}></img><p className="font13">{thistwt ? thistwt.retweets : props.tweet.retweets}</p>
+        </div>
 
-        {doesLike ?<div className={classbutton} onClick={(e)=>{
+        <div className={classbutton} onClick={(e)=>{
           e.stopPropagation()
-          likeCommentHere(props.id, thistwt.likes, thistwt.userlikes)  
-          }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "liked.svg"}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
-        </div> : <div className={classbutton} onClick={(e)=>{
-          e.stopPropagation()
-          likeCommentHere(props.id, thistwt.likes, thistwt.userlikes)
-          }}><img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "notliked.svg"}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
-        </div>} 
+          likeCommentHere(props.id, thistwt.likes, thistwt.userlikes)          
+          }}><img alt="" className="smalllogos " src={process.env.PUBLIC_URL + likesrc}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
+        </div> 
+
         <p></p>
       </div>
-
+      {hidden ? null : <div onClick={(e)=>{
+        e.stopPropagation()
+        hiddenHandler()
+      }} className="overlay">
+        <div  className="typeofquotediv">
+          <div onClick={() =>{
+            retweetCommentHere(props.id, thistwt.retweets, thistwt.userretweets)
+          }}>{doesRetweet ? "Undo Retweet" : "Retweet"}</div>
+          <div onClick={(e)=>{
+        e.stopPropagation()
+        navigate(`/addtweet/quote/${props.id}`, true)
+      }}>Quote Tweet</div>
+          <button onClick={(e)=>{
+            e.preventDefault()
+        e.stopPropagation()
+        hiddenHandler()
+      }}>Cancel</button>
+        </div>
+      </div> }
     </div>
 
 

@@ -43,6 +43,7 @@ function App() {
       <Route path="/home" element={<Home />} />
       <Route path={`/viewtweet/:tweetID`} element={<ViewTweet  />} />
       <Route path='/addtweet' element={<AddTweet />} />
+      <Route path='/addtweet/quote/:quoteID' element={<AddTweet />} />
       <Route path='/viewtweet/:tweetID/viewimage' element={<ViewImage />} />
       </Routes>
     </HashRouter>
