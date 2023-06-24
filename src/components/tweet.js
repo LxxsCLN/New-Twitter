@@ -1,7 +1,7 @@
 import { getAuth, } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import React from "react"
-import { useNavigate, } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import {
@@ -23,6 +23,7 @@ function Tweet(props) {
     appId: "1:845912882937:web:d1d5fe3a1fe71bc14c6c28"
   };
 
+
   initializeApp(firebaseConfig);   
   const auth = getAuth();
 
@@ -32,6 +33,7 @@ function Tweet(props) {
   
   const navigate = useNavigate();
   const db = getFirestore();  
+
 
   const currentdate = new Date()
   const currentdateutc = currentdate.toUTCString()
@@ -60,59 +62,7 @@ function Tweet(props) {
     loadtwt()      
   }, [isLiked])  
 
-  /* function onMediaFileSelected(event) {
-  event.preventDefault();
-  var file = event.target.files[0];
-
-  // Clear the selection in the file picker input.
-  imageFormElement.reset();
-
-  // Check if the file is an image.
-  if (!file.type.match('image.*')) {
-    var data = {
-      message: 'You can only share images',
-      timeout: 2000,
-    };
-    signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
-    return;
-  }
-  // Check if the user is signed-in
-  if (checkSignedInWithMessage()) {
-    saveImageMessage(file);
-  }
-}
-
-async function saveImageMessage(file) {
-  try {
-    // 1 - We add a message with a loading icon that will get updated with the shared image.
-    const messageRef = await addDoc(collection(getFirestore(), 'messages'), {
-      name: getUserName(),
-      imageUrl: LOADING_IMAGE_URL,
-      profilePicUrl: getProfilePicUrl(),
-      timestamp: serverTimestamp()
-    });
-
-    // 2 - Upload the image to Cloud Storage.
-    const filePath = `${getAuth().currentUser.uid}/${messageRef.id}/${file.name}`;
-    const newImageRef = ref(getStorage(), filePath);
-    const fileSnapshot = await uploadBytesResumable(newImageRef, file);
-    
-    // 3 - Generate a public URL for the file.
-    const publicImageUrl = await getDownloadURL(newImageRef);
-
-    // 4 - Update the chat message placeholder with the image's URL.
-    await updateDoc(messageRef,{
-      imageUrl: publicImageUrl,
-      storageUri: fileSnapshot.metadata.fullPath
-    });
-  } catch (error) {
-    console.error('There was an error uploading a file to Cloud Storage:', error);
-  }
-}
-
-*/
-
-  
+   
   async function likeTweetHere(id, likes, usrlikes){
 
     const doesLike = usrlikes.includes(getAuth().currentUser.uid)
@@ -161,33 +111,35 @@ async function saveImageMessage(file) {
   const classbutton = !doesLike ? "smalllogosdiv" : "smalllogosdiv scale-up-center";
   const classbutton2 = !doesRetweet ? "smalllogosdiv" : "smalllogosdiv scale-up-center";
 
+ 
     return (
     <div onClick={()=>{
-      navigate("/viewtweet", true)
-      props.setsingletweet(props.id)
+      navigate(`/viewtweet/${props.id}`, { state: { tweetID: props.id }});
     }} className="tweet">  
       
       <img referrerPolicy="no-referrer" className="tweetuserimg" alt="" src={props.tweet.profilePicUrl}></img>
       
       <div className="toptweetdiv">
         <div className="nametimetweet">        
-        <h4>{props.tweet.name}</h4>
-        {props.tweet.isverified ? <img alt="" src={process.env.PUBLIC_URL + "verified.svg"} className="smalllogos verifiedlogo"></img> : null}
-        {props.tweet.isverifiedgold ? <img alt="" src={process.env.PUBLIC_URL + "premiumverified.svg"} className="smalllogos verifiedlogo"></img> : null}
-        <p className="timedif">@{props.tweet.at}</p> ·
-        <p className="timedif">{secdif > (358 * 86400) ? date3 : secdif > 86400 ? date2 : secdif > 3600 ? Math.floor(secdif/3600)+"h" : secdif > 60 ? Math.floor(secdif/60)+"m" : secdif+"s"}</p>
+          <h4>{props.tweet.name}</h4>
+          {props.tweet.isverified ? <img alt="" src={process.env.PUBLIC_URL + "verified.svg"} className="smalllogos verifiedlogo"></img> : null}
+          {props.tweet.isverifiedgold ? <img alt="" src={process.env.PUBLIC_URL + "premiumverified.svg"} className="smalllogos verifiedlogo"></img> : null}
+          <p className="timedif">@{props.tweet.at}</p> ·
+          <p className="timedif">{secdif > (358 * 86400) ? date3 : secdif > 86400 ? date2 : secdif > 3600 ? Math.floor(secdif/3600)+"h" : secdif > 60 ? Math.floor(secdif/60)+"m" : secdif+"s"}</p>
         </div>
 
-          {currentUser === props.tweet.author ? <div className="smalllogos" onClick={async(e)=>{
-          e.stopPropagation()
-          e.preventDefault()
-          await props.deleteTweet(props.id);
-          }} ><img className="smalllogos" alt="" src={process.env.PUBLIC_URL + "delete.svg"}></img></div> : null}
+        {currentUser === props.tweet.author ? <div className="smalllogos" onClick={async(e)=>{
+        e.stopPropagation()
+        e.preventDefault()
+        await props.deleteTweet(props.id);
+        }} ><img className="smalllogos" alt="" src={process.env.PUBLIC_URL + "delete.svg"}></img></div> : null}
 
       </div>
 
-      <p className="tweettext">{props.tweet.tweet}</p>
-      {props.tweet.imgurl === "" ? null : <img className="onehund" alt="" src={props.tweet.imgurl}></img>}
+      {props.tweet.tweet !== "" ? <p className="tweettext margin50">{props.tweet.tweet}</p> : null}
+      
+
+      {props.tweet.imgurl === "" ? null : <img className="onehund border16 margin50" alt="" src={props.tweet.imgurl}></img>}
 
       <div className="bottweetdiv">
         <div className="smalllogosdiv"> <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + "comment.svg"}></img><p className="font13">{props.tweet.comments}</p></div>

@@ -3,23 +3,22 @@ import { useEffect, useState } from "react";
 import Nav from "./nav";
 import SingleTweet from "./singletweet";
 import Comment from "./comment";
+import { useParams } from "react-router-dom";
 
 import uniqid from 'uniqid';
 
 import {
   getFirestore,
-  collection,
-  query,
-  orderBy,
-  limit,
   updateDoc,
   deleteDoc,
   doc,
   getDoc,
-  getDocs,
 } from 'firebase/firestore';
 
-function ViewTweet(props) {
+function ViewTweet() {
+
+  const { tweetID2 } = useParams()
+
   const [isLiked, setIsLiked] = useState(false)
   const db = getFirestore();
   const [tweet, setTweet] = useState()
@@ -86,7 +85,7 @@ function ViewTweet(props) {
     
     const loadTweets = async () => {
 
-      const singletwt = doc(getFirestore(), "Tweets", props.thisTweet); 
+      const singletwt = doc(getFirestore(), "Tweets", tweetID2); 
       const singletwtSnap = await getDoc(singletwt);
       const singletwtdata = singletwtSnap.data() 
 
@@ -108,7 +107,7 @@ function ViewTweet(props) {
         const singletwt = doc(getFirestore(), "Tweets", elem); 
         const singletwtSnap = await getDoc(singletwt);
         const singletwtdata = singletwtSnap.data() 
-        comments1.push(<Comment tweet={singletwtdata} key={uniqid()} id={singletwtSnap.id} docid={docid} deleteComment={deleteComment} setsingletweet={props.setsingletweet} />)        
+        comments1.push(<Comment tweet={singletwtdata} key={uniqid()} id={singletwtSnap.id} docid={docid} deleteComment={deleteComment} />)        
         counter++;
         if (counter >= docdata.commentsarray.length){
           let newarr = comments1.sort(compare)
@@ -117,14 +116,14 @@ function ViewTweet(props) {
       })
     }
     loadTweets()
-  }, [isLiked, props.thisTweet])
+  }, [isLiked, tweetID2])
    
 
 
     return (
                 
       <div className="ViewTweet">
-        <Nav back={true} />
+        <Nav back={true}  />
         {tweet}
         {comms ? comms : null}
       </div>

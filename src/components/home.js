@@ -19,7 +19,7 @@ import {
 } from 'firebase/firestore';
 
 
-function Home(props) {
+function Home() {
 
   const firebaseConfig = {
     apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
@@ -35,6 +35,7 @@ function Home(props) {
   const auth = getAuth();
   const db = getFirestore();
   const [tweetsarray, setTweetsArray] = useState();
+  const [isLiked, setIsLiked] = useState(false)
 
   async function deleteTweet(id){
 
@@ -48,6 +49,7 @@ function Home(props) {
     }
     await deleteDoc(doc(db, "Tweets", id));
     setTweetsArray(tweetsarray)
+    setIsLiked(!isLiked)
   }     
 
 
@@ -76,7 +78,7 @@ useEffect(()=>{
         const authordata = docSnap.data() 
 
         if (!data2.iscomment) {
-          twarr.push(<Tweet key={uniqid()} authordata={authordata} tweet={data2} id={doc2.id} setsingletweet={props.setsingletweet} deleteTweet={deleteTweet} />)
+          twarr.push(<Tweet key={uniqid()} authordata={authordata} tweet={data2} id={doc2.id} deleteTweet={deleteTweet} />)
           if (twarr.length > 1){
             let newarr = twarr.sort(compare)
             setTweetsArray(newarr)
@@ -88,7 +90,7 @@ useEffect(()=>{
     }    
   }
   loadTweets() 
-}, [])
+}, [isLiked])
 
   return (
     

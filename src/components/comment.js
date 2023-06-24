@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import React from "react"
 import { useNavigate, } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Link, useParams, useLocation } from "react-router-dom";
 
 import {
   getFirestore,
@@ -26,6 +27,7 @@ function Comment(props) {
   const provider = new GoogleAuthProvider();  
   const auth = getAuth();
   const navigate = useNavigate();
+  const location = useLocation()
 
 
   const [thistwt, setThisTwt] = useState(props.tweet)
@@ -112,7 +114,7 @@ function Comment(props) {
 
     return (
 <div onClick={()=>{
-      props.setsingletweet(props.id)
+      navigate(`/viewtweet/${props.id}`, { state: { tweetID: props.id }});
     }} className="tweet">  
       
       <img referrerPolicy="no-referrer" className="tweetuserimg" alt="" src={props.tweet.profilePicUrl}></img>
@@ -131,8 +133,8 @@ function Comment(props) {
           props.deleteComment(props.docid, props.id)}}><img className="smalllogos" alt="" src={process.env.PUBLIC_URL + "delete.svg"}></img></div> : null}
       </div>
 
-      <p className="tweettext">{props.tweet.tweet}</p>
-      {props.tweet.imgurl === "" ? null : <img className="onehund" alt="" src={props.tweet.imgurl}></img>}
+      {props.tweet.tweet !== "" ? <p className="tweettext margin50">{props.tweet.tweet}</p> : null}
+      {props.tweet.imgurl === "" ? null : <img className="onehund border16 margin50" alt="" src={props.tweet.imgurl}></img>}
 
       <div className="bottweetdiv">
 

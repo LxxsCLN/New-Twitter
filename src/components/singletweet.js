@@ -19,12 +19,11 @@ import {
 import {
   getStorage,
   ref,
-  uploadBytesResumable,
   getDownloadURL,
   uploadBytes
 } from 'firebase/storage';
 
-function SingleTweet(props) {
+function SingleTweet(props) {  
 
   const firebaseConfig = {
     apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
@@ -210,17 +209,20 @@ function SingleTweet(props) {
         <div className="toptweetdiv">
         <div className="singletweetname">{props.tweet.name}   {props.tweet.isverified ? <img alt="" src={process.env.PUBLIC_URL + "verified.svg"} className="smalllogos verifiedlogo"></img> : null}
         {props.tweet.isverifiedgold ? <img alt="" src={process.env.PUBLIC_URL + "premiumverified.svg"} className="smalllogos verifiedlogo"></img> : null}</div>
-        {currentUser === props.tweet.author ? <div onClick={async (e)=>{
-        e.preventDefault()
         
+        {currentUser === props.tweet.author ? <div onClick={async (e)=>{
+        e.preventDefault()        
         await props.updateParentTweet(props.id)
         navigate("/home", true)
         }} ><img className="smalllogos" alt="" src={process.env.PUBLIC_URL + "delete.svg"}></img></div> : null}
         
         </div>
-        <p className="timedif">@{props.tweet.at}</p>
-        <p className="singletweettext spantwocolumn">{props.tweet.tweet}</p>
-        {props.tweet.imgurl === "" ? null : <img className="onehund" alt="" src={props.tweet.imgurl}></img>}
+        <p className="timedif timedif2">@{props.tweet.at}</p>
+        {props.tweet.tweet !== "" ? <p className="singletweettext spantwocolumn">{props.tweet.tweet}</p> : null}
+        
+
+        {props.tweet.imgurl === "" ? null : <img className="onehund border16 spantwocolumn" alt="" src={props.tweet.imgurl}></img>}
+
         <p className="finaldate spantwocolumn">{finaldate}</p>
         
           <div className="bottweetdiv bottweetdiv2 spantwocolumn">
@@ -269,7 +271,7 @@ function SingleTweet(props) {
         </form> : 
 
         <form className="replyformbig">
-        <p className="span3col">Replying to: @{props.tweet.at}</p>
+        <div className="span3col graycolor replyingto font15">Replying to <p className="font15" style={{color: "black"}}> @{props.tweet.at}</p></div>
         <img className=" tweetuserimg tweetuserimgsingle2 " alt="" src={user.photoURL}></img>
           <textarea autoFocus rows={3} ref={empty} onChange={handleChange} className="commentinputbig span2cols" placeholder="Tweet your reply!"></textarea>
           {imgSrc === "" ? null : <div className="span4cols"><p></p><div className="removeimgsvgdiv" onClick={ (e) =>{
@@ -277,13 +279,13 @@ function SingleTweet(props) {
           removeImage();
         } }><img className="removeimgsvgsvg" alt="" src={process.env.PUBLIC_URL + "removeimgsvg.svg"} ></img></div><img className="addimageimage " alt="" src={imgSrc}></img></div> }
           
-          <label htmlFor="mediaCapture" className="addimagelabel span3cols">
-          <img alt="" src={process.env.PUBLIC_URL + "addimage.svg"} className="smalllogos verifiedlogo"></img>
+          <label htmlFor="mediaCapture" className="addimagelabel span3cols font15" style={{color: "black"}}>
+          <img alt="" src={process.env.PUBLIC_URL + "addimage.svg"} className="smalllogos verifiedlogo "></img>
           Choose image
           <input onChange={(e) => {
             e.preventDefault()            
             handleImageChange(e)
-          }} key={keyState} id="mediaCapture" type="file" accept="image/*" capture="camera"></input>
+          }} key={keyState} id="mediaCapture" type="file" accept="image/*"></input>
         </label>
           <button className="replybutton" onClick={(e)=>{
             e.preventDefault()

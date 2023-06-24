@@ -4,15 +4,12 @@ import { useNavigate, } from "react-router-dom";
 import {  useRef, useState } from "react";
 import uniqid from 'uniqid';
 
-
 import {
   getStorage,
   ref,
-  uploadBytesResumable,
   getDownloadURL,
   uploadBytes
 } from 'firebase/storage';
-
 
 import {
   getFirestore,
@@ -22,8 +19,8 @@ import {
   getDoc,
   serverTimestamp,
 } from 'firebase/firestore';
-import Nav from "./nav";
 
+import Nav from "./nav";
 
 function AddTweet() {
 
@@ -125,15 +122,15 @@ function AddTweet() {
           <input onChange={(e) => {
             e.preventDefault()            
             handleImageChange(e)
-          }} key={keyState} id="mediaCapture" type="file" accept="image/*" capture="camera"></input>
+          }} key={keyState} id="mediaCapture" type="file" accept="image/*"></input>
         </label>
 
         
           
 
-        <div className="everyonecanreply span3cols"><img alt="" src={process.env.PUBLIC_URL + "world.svg"} className="smalllogos"></img>Everyone can reply</div>
+        
       </form>  
-
+      <div className="everyonecanreply span3cols"><img alt="" src={process.env.PUBLIC_URL + "world.svg"} className="smalllogos"></img>Everyone can reply</div>
       
 
       </div>

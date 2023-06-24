@@ -1,7 +1,7 @@
 import { getAuth,signOut, } from "firebase/auth";
 import { initializeApp } from "firebase/app";
-import React from "react"
-import { useNavigate, } from "react-router-dom";
+import React, { useState } from "react"
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 function Nav(props) {
@@ -16,17 +16,26 @@ function Nav(props) {
   const app = initializeApp(firebaseConfig); 
   const auth = getAuth();
 
-  
+  const location = useLocation()
+
+  const [isLiked, setIsLiked] = useState(false)
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
 
-const shadow = !props.back ? "shadow nav" : "nav"
+  const shadow = !props.back ? "shadow nav" : "nav"
 
     return (
       <div className={shadow}>
-          {props.back ? <div onClick={()=>{
-            navigate("/home", true)
-          }} className="backsvgdiv"><img  className="backsvg" alt="" src={process.env.PUBLIC_URL + "back.svg"}></img></div>  : <img referrerPolicy="no-referrer" src={user ? user.photoURL : process.env.PUBLIC_URL + "white.png"} alt="" className="userlogo"></img>}
+
+          {props.back ? 
+          
+          <div onClick={()=>{
+            navigate(-1)
+            setIsLiked(!isLiked)
+            
+          }} className="backsvgdiv"><img  className="backsvg" alt="" src={process.env.PUBLIC_URL + "back.svg"}></img></div> 
+          
+          : <img referrerPolicy="no-referrer" src={user ? user.photoURL : process.env.PUBLIC_URL + "white.png"} alt="" className="userlogo"></img>}
         
         <img onClick={()=>{
             navigate("/home", true)

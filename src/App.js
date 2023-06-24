@@ -34,18 +34,13 @@ function App() {
   const db = getFirestore();
     
   
-  const [thisTweet, setThisTweet] = useState()
-
-  function setsingletweet(docid){
-    setThisTweet(docid)
-  }
-
+  
   return (
     <HashRouter>
       <Routes>
       <Route path="/" element={<Login />} />
-      <Route path="/home" element={<Home setsingletweet={setsingletweet} />} />
-      <Route path="/viewtweet" element={<ViewTweet thisTweet={thisTweet} setsingletweet={setsingletweet} />} />
+      <Route path="/home" element={<Home />} />
+      <Route path={`/viewtweet/:tweetID2`} element={<ViewTweet  />} />
       <Route path='/addtweet' element={<AddTweet />} />
       </Routes>
     </HashRouter>
