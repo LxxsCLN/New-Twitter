@@ -32,7 +32,7 @@ function QuoteTweet(props) {
         }} className={classn}>
         {props.tweet ?        
 
-            <div className="quotetweet">            
+            <div className="quotetweet hover">            
       
             <div className="toptweetdiv2">
             <img referrerPolicy="no-referrer" className="quotetweetuserimg" alt="" src={props.tweet.profilePicUrl}></img>

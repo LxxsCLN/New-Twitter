@@ -61,13 +61,13 @@ function Login() {
   return (
     <div className="login">
       <img alt="" src={process.env.PUBLIC_URL + "logo.png"} className="loginlogo"></img>
-      <h1>Bienvenido a New Twitter</h1>
+      <h1>New Twitter</h1>
 
       <div onClick={()=>{
         signInWithRedirect(auth, provider);
       } } id="customBtn" className="customGPlusSignIn loginbutton">
       <span className="icon"></span>
-      <span className="buttonText">Ingresar</span>
+      <span className="buttonText">Log in</span>
     </div>
     </div>
   );
