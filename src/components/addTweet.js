@@ -26,8 +26,7 @@ import QuoteTweet from "./quotetweet";
 function AddTweet() {
 
     const { quoteID } = useParams()
-    const db = getFirestore();  
-    console.log("quoteid: ", quoteID)
+    const db = getFirestore();
 
     const [quotedata, setquotedata] = useState()
 

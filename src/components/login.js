@@ -10,17 +10,9 @@ import {
   getDoc,
   serverTimestamp,
 } from 'firebase/firestore';
-
+import { firebaseConfig } from "../env";
 function Login() {
-  const firebaseConfig = {
-    apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
-    authDomain: "newtwitterlxxs.web.app",
-    projectId: "newtwitterlxxs",
-    storageBucket: "newtwitterlxxs.appspot.com",
-    messagingSenderId: "845912882937",
-    appId: "1:845912882937:web:d1d5fe3a1fe71bc14c6c28"
-  };
-
+  
   const app = initializeApp(firebaseConfig);  
   const provider = new GoogleAuthProvider();  
   const auth = getAuth();

@@ -3,16 +3,9 @@ import { initializeApp } from "firebase/app";
 import React, { useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
-
+import { firebaseConfig } from "../env";
 function Nav(props) {
-  const firebaseConfig = {
-    apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
-    authDomain: "newtwitterlxxs.web.app",
-    projectId: "newtwitterlxxs",
-    storageBucket: "newtwitterlxxs.appspot.com",
-    messagingSenderId: "845912882937",
-    appId: "1:845912882937:web:d1d5fe3a1fe71bc14c6c28"
-  };
+
   const app = initializeApp(firebaseConfig); 
   const auth = getAuth();
 

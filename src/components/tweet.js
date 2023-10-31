@@ -11,19 +11,8 @@ import {
   updateDoc
 } from 'firebase/firestore';
 import QuoteTweet from "./quotetweet";
-
-
+import { firebaseConfig } from "../env";
 function Tweet(props) {
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyBZjFRwHGznnJMPSDhAo-nFt5zVBcU6l3c",
-    authDomain: "newtwitterlxxs.web.app",
-    projectId: "newtwitterlxxs",
-    storageBucket: "newtwitterlxxs.appspot.com",
-    messagingSenderId: "845912882937",
-    appId: "1:845912882937:web:d1d5fe3a1fe71bc14c6c28"
-  };
-
 
   initializeApp(firebaseConfig);   
   const auth = getAuth();
@@ -71,9 +60,23 @@ function Tweet(props) {
     loadtwt()      
   }, [isLiked])  
 
+  let classbutton = !doesLike ? "smalllogosdiv" : "smalllogosdiv scale-up-center";
+  let classbutton2 = !doesRetweet ? "smalllogosdiv" : "smalllogosdiv scale-up-center";
+  let likesrc = !doesLike ? "notliked.svg" : "liked.svg"
+  let retweetsrc = !doesRetweet ? "notretweeted.svg" : "retweeted.svg"
    
-  async function likeTweetHere(id, likes, usrlikes){
-
+  async function likeTweetHere(id, likes, usrlikes, div){
+    div.style.pointerEvents = 'none';
+    if (div.classList.contains("scale-up-center")){
+      div.className = "smalllogosdiv"
+      div.firstChild.src = "notliked.svg"
+      div.lastChild.innerText = Number(div.lastChild.innerText) - 1
+    } else {
+      div.className = "smalllogosdiv scale-up-center"
+      div.firstChild.src = "liked.svg"
+      div.lastChild.innerText = Number(div.lastChild.innerText) + 1
+    }
+    
     const doesLike = usrlikes.includes(getAuth().currentUser.uid)
     const newuserlikes = [...usrlikes] 
     const currTWT = doc(getFirestore(), "Tweets", id);
@@ -92,6 +95,7 @@ function Tweet(props) {
       userlikes: newuserlikes,
       });
     setIsLiked(!isLiked)
+    div.style.pointerEvents = 'auto';
   }
 
   async function retweetHere(id, retweets, usrretweets){
@@ -114,14 +118,7 @@ function Tweet(props) {
       userretweets: newuserretweets,
       });
     setIsLiked(!isLiked)
-    
   }
-
-  const classbutton = !doesLike ? "smalllogosdiv" : "smalllogosdiv scale-up-center";
-  const classbutton2 = !doesRetweet ? "smalllogosdiv" : "smalllogosdiv scale-up-center";
-  const likesrc = !doesLike ? "notliked.svg" : "liked.svg"
-  const retweetsrc = !doesRetweet ? "notretweeted.svg" : "retweeted.svg"
-
 
   const [hidden, setHidden] = useState(true)
 
@@ -182,9 +179,10 @@ function Tweet(props) {
         <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + retweetsrc}></img><p className="font13">{thistwt ? thistwt.retweets : props.tweet.retweets}</p>
         </div>
 
-        <div className={classbutton} onClick={(e)=>{
+        <div id="likebuttondiv" className={classbutton} onClick={(e)=>{
           e.stopPropagation()
-          likeTweetHere(props.id, thistwt.likes, thistwt.userlikes)          
+          let div = e.target.closest("#likebuttondiv");
+          likeTweetHere(props.id, thistwt.likes, thistwt.userlikes, div)          
           }}><img alt="" className="smalllogos " src={process.env.PUBLIC_URL + likesrc}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
         </div>
 
