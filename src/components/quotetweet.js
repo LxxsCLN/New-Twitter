@@ -35,7 +35,7 @@ function QuoteTweet(props) {
             <div className="quotetweet hover">            
       
             <div className="toptweetdiv2">
-            <img referrerPolicy="no-referrer" className="quotetweetuserimg" alt="" src={props.tweet.profilePicUrl}></img>
+            <img referrerPolicy="no-referrer" className="quotetweetuserimg" alt="" src={props.tweet.profilePicUrl || "https://i.redd.it/7ayjc8s4j2n61.png"}></img>
             <div className="nametimetweet">        
             <h4>{props.tweet.name}</h4>
             {props.tweet.isverified ? <img alt="" src={process.env.PUBLIC_URL + "verified.svg"} className="smalllogos verifiedlogo"></img> : null}

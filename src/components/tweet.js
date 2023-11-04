@@ -57,7 +57,10 @@ function Tweet(props) {
         setquotedata(tweet)
       }
     }
-    loadtwt()      
+    loadtwt().then(() => {
+      let div = document.getElementById(`${props.id}`)      
+      if (div) div.style.pointerEvents = 'auto';
+    })    
   }, [isLiked])  
 
   let classbutton = !doesLike ? "smalllogosdiv" : "smalllogosdiv scale-up-center";
@@ -65,17 +68,7 @@ function Tweet(props) {
   let likesrc = !doesLike ? "notliked.svg" : "liked.svg"
   let retweetsrc = !doesRetweet ? "notretweeted.svg" : "retweeted.svg"
    
-  async function likeTweetHere(id, likes, usrlikes, div){
-    div.style.pointerEvents = 'none';
-    if (div.classList.contains("scale-up-center")){
-      div.className = "smalllogosdiv"
-      div.firstChild.src = "notliked.svg"
-      div.lastChild.innerText = Number(div.lastChild.innerText) - 1
-    } else {
-      div.className = "smalllogosdiv scale-up-center"
-      div.firstChild.src = "liked.svg"
-      div.lastChild.innerText = Number(div.lastChild.innerText) + 1
-    }
+  async function likeTweetHere(id, likes, usrlikes){    
     
     const doesLike = usrlikes.includes(getAuth().currentUser.uid)
     const newuserlikes = [...usrlikes] 
@@ -95,7 +88,6 @@ function Tweet(props) {
       userlikes: newuserlikes,
       });
     setIsLiked(!isLiked)
-    div.style.pointerEvents = 'auto';
   }
 
   async function retweetHere(id, retweets, usrretweets){
@@ -131,7 +123,7 @@ function Tweet(props) {
       navigate(`/viewtweet/${props.id}`);
     }} className="tweet">  
       
-      <img referrerPolicy="no-referrer" className="tweetuserimg" alt="" src={props.tweet.profilePicUrl}></img>
+      <img referrerPolicy="no-referrer" className="tweetuserimg" alt="" src={props.tweet.profilePicUrl || "https://i.redd.it/7ayjc8s4j2n61.png"}></img>
       
       <div className="toptweetdiv">
         <div className="nametimetweet">        
@@ -179,11 +171,21 @@ function Tweet(props) {
         <img alt="" className="smalllogos" src={process.env.PUBLIC_URL + retweetsrc}></img><p className="font13">{thistwt ? thistwt.retweets : props.tweet.retweets}</p>
         </div>
 
-        <div id="likebuttondiv" className={classbutton} onClick={(e)=>{
+        <div id={props.id} className={classbutton} onClick={(e)=>{
           e.stopPropagation()
-          let div = e.target.closest("#likebuttondiv");
-          likeTweetHere(props.id, thistwt.likes, thistwt.userlikes, div)          
-          }}><img alt="" className="smalllogos " src={process.env.PUBLIC_URL + likesrc}></img><p className="font13">{thistwt ? thistwt.likes : props.tweet.likes}</p>
+          let div = document.getElementById(`${props.id}`);
+          div.style.pointerEvents = "none"
+          if (div.classList.contains("scale-up-center")){
+            div.className = "smalllogosdiv"
+            div.firstChild.src = "notliked.svg"
+            div.lastChild.innerText = Number(div.lastChild.innerText) - 1
+          } else {
+            div.className = "smalllogosdiv scale-up-center"
+            div.firstChild.src = "liked.svg"
+            div.lastChild.innerText = Number(div.lastChild.innerText) + 1
+          }
+          likeTweetHere(props.id, thistwt.likes, thistwt.userlikes)          
+          }}><img alt="" className="smalllogos " src={process.env.PUBLIC_URL + likesrc} onClick={() => {return false}}></img><p className="font13" onClick={() => {return false}}>{thistwt ? thistwt.likes : props.tweet.likes}</p>
         </div>
 
         <p></p>

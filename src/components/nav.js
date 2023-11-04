@@ -14,7 +14,6 @@ function Nav(props) {
   const [isLiked, setIsLiked] = useState(false)
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
-
   const shadow = !props.back ? "shadow nav" : "nav"
 
     return (
@@ -28,7 +27,7 @@ function Nav(props) {
             
           }} className="backsvgdiv"><img  className="backsvg" alt="" src={process.env.PUBLIC_URL + "back.svg"}></img></div> 
           
-          : <img referrerPolicy="no-referrer" src={user ? user.photoURL : process.env.PUBLIC_URL + "white.png"} alt="" className="userlogo"></img>}
+          : <img referrerPolicy="no-referrer" src={user?.photoURL || "https://i.redd.it/7ayjc8s4j2n61.png"} alt="" className="userlogo"></img>}
         
         <img onClick={()=>{
             navigate("/home", true)

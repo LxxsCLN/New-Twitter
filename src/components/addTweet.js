@@ -122,7 +122,7 @@ function AddTweet() {
 
 
         <form className="writetweet">
-        <img className=" tweetuserimg tweetuserimgsingle span3rows" alt="" src={getAuth().currentUser.photoURL}></img>
+        <img className=" tweetuserimg tweetuserimgsingle span3rows" alt="" src={getAuth().currentUser.photoURL || "https://i.redd.it/7ayjc8s4j2n61.png"}></img>
         <div className="everyone">Everyone <img alt="" src={process.env.PUBLIC_URL + "bottomarrow.svg"} className="smalllogos"></img></div>
         <button className="submittweet replybutton" onClick={(e) => {
           e.preventDefault()

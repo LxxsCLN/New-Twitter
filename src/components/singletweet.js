@@ -139,17 +139,8 @@ function SingleTweet(props) {
   let likesrc = !doesLike ? "notliked.svg" : "liked.svg"
   let retweetsrc = !doesRetweet ? "notretweeted.svg" : "retweeted.svg"
 
-  async function likeTweetHere(id, likes, usrlikes, div){
-    div.style.pointerEvents = 'none';
-    if (div.classList.contains("scale-up-center")){
-      div.className = "smalllogosdiv"
-      div.firstChild.src = "notliked.svg"
-      div.lastChild.innerText = Number(div.lastChild.innerText) - 1
-    } else {
-      div.className = "smalllogosdiv scale-up-center"
-      div.firstChild.src = "liked.svg"
-      div.lastChild.innerText = Number(div.lastChild.innerText) + 1
-    }
+  async function likeTweetHere(id, likes, usrlikes){
+    
     const doesLike = usrlikes.includes(getAuth().currentUser.uid)
     const newuserlikes = [...usrlikes] 
     const currTWT = doc(getFirestore(), "Tweets", id);
@@ -168,7 +159,6 @@ function SingleTweet(props) {
       userlikes: newuserlikes,
       });
     setIsLiked(!isLiked)
-    div.style.pointerEvents = 'auto';
   }
 
   async function retweetHere(id, retweets, usrretweets){
@@ -210,7 +200,10 @@ function SingleTweet(props) {
         setquotedata(tweet)
       }
     }
-    loadtwt()      
+    loadtwt().then(() => {
+      let div = document.getElementById(`${props.id}`)      
+      if (div) div.style.pointerEvents = 'auto';
+    })      
   }, [isLiked])
 
   const [hidden, setHidden] = useState(true)
@@ -223,7 +216,7 @@ function SingleTweet(props) {
     <div>
     <div className="singletweet">       
              
-        <img className="tweetuserimg tweetuserimgsingle " alt="" src={props.tweet.profilePicUrl}></img>
+        <img className="tweetuserimg tweetuserimgsingle " alt="" src={props.tweet.profilePicUrl || "https://i.redd.it/7ayjc8s4j2n61.png"}></img>
 
         <div className="toptweetdiv">
         <div className="singletweetname">{props.tweet.name}   {props.tweet.isverified ? <img alt="" src={process.env.PUBLIC_URL + "verified.svg"} className="smalllogos verifiedlogo"></img> : null}
@@ -261,10 +254,20 @@ function SingleTweet(props) {
         <img alt="" className="smalllogos2" src={process.env.PUBLIC_URL + retweetsrc}></img><p className="font14">{thistwt ? thistwt.retweets : props.tweet.retweets}</p>
         </div>
 
-        <div id="likebuttondivS" className={classbutton} onClick={(e)=>{
+        <div id={props.id} className={classbutton} onClick={(e)=>{
           e.stopPropagation()
-          let div = e.target.closest("#likebuttondivS");
-          likeTweetHere(props.id, thistwt.likes, thistwt.userlikes, div)          
+          let div = document.getElementById(`${props.id}`);
+          div.style.pointerEvents = "none"
+          if (div.classList.contains("scale-up-center")){
+            div.className = "smalllogosdiv"
+            div.firstChild.src = "notliked.svg"
+            div.lastChild.innerText = Number(div.lastChild.innerText) - 1
+          } else {
+            div.className = "smalllogosdiv scale-up-center"
+            div.firstChild.src = "liked.svg"
+            div.lastChild.innerText = Number(div.lastChild.innerText) + 1
+          }
+          likeTweetHere(props.id, thistwt.likes, thistwt.userlikes)          
           }}><img alt="" className="smalllogos2 " src={process.env.PUBLIC_URL + likesrc}></img><p className="font14">{thistwt ? thistwt.likes : props.tweet.likes}</p>
         </div> 
 
@@ -279,14 +282,14 @@ function SingleTweet(props) {
           <form className="replyform" onClick={() =>{
             setDisplay(!display)
           } }>
-          <img className=" tweetuserimg tweetuserimgsingle " alt="" src={user.photoURL}></img>
+          <img className=" tweetuserimg tweetuserimgsingle " alt="" src={user.photoURL || "https://i.redd.it/7ayjc8s4j2n61.png"}></img>
           <input className="commentinput" placeholder="Tweet your reply!"></input>
           <button className="replybutton lowopacity" >Reply</button>
         </form> : 
 
         <form className="replyformbig">
         <div className="span3col graycolor replyingto font15">Replying to <p className="font15" style={{color: "black"}}> @{props.tweet.at}</p></div>
-        <img className=" tweetuserimg tweetuserimgsingle2 " alt="" src={user.photoURL}></img>
+        <img className=" tweetuserimg tweetuserimgsingle2 " alt="" src={user.photoURL || "https://i.redd.it/7ayjc8s4j2n61.png"}></img>
           <textarea autoFocus rows={3} ref={empty} onChange={handleChange} className="commentinputbig span2cols" placeholder="Tweet your reply!"></textarea>
           {imgSrc === "" ? null : <div className="span4cols"><p></p><div className="removeimgsvgdiv" onClick={ (e) =>{
           e.preventDefault()
